@@ -14,7 +14,7 @@ const categoryFilters = ['All', 'Wedding', 'Seven Blessings', 'Engagement', 'Gif
 const events = [
   {
     id: '1',
-    title: 'Bar Mitzvah of Elijah Goldstein',
+    title: 'Bars Mitzvah of Elijah Goldstein',
     date: 'August 3, 2025',
     location: 'Temple Beth Shalom, Brooklyn',
     category: 'Wedding',

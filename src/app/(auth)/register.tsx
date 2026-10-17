@@ -1,30 +1,37 @@
 import Button from '@/components/ui/Button';
 import InputField from '@/components/ui/InputField';
 import tw from '@/lib/tw';
+import { useRegisterMutation } from '@/services/authApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Lock, Mail, User } from 'lucide-react-native';
 import { useState } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import { Alert, Text, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Register() {
-  const [fullName, setFullName] = useState('shukumar');
-  const [email, setEmail] = useState('shukumar@example.com');
-  const [password, setPassword] = useState('123456');
-  const [confirmPassword, setConfirmPassword] = useState('123456');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const [fullNameError, setFullNameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
-  const [loading, setLoading] = useState(false);
+  const [register, { isLoading }] = useRegisterMutation();
 
   const validate = () => {
     let valid = true;
+
+    // purono error clear kora
+    setFullNameError('');
+    setEmailError('');
+    setPasswordError('');
+    setConfirmPasswordError('');
 
     if (!fullName.trim()) {
       setFullNameError('Full name is required');
@@ -58,17 +65,35 @@ export default function Register() {
   const handleRegister = async () => {
     if (!validate()) return;
 
-    setLoading(true);
-    router.push({
-      pathname: '/(auth)/OtpVerification',
-      params: { email, purpose: 'register' },
-    });
     try {
-      // API call 
-    } catch (e) {
-      console.warn(e);
-    } finally {
-      setLoading(false);
+      const res = await register({
+        fullName: fullName.trim(),
+        email: email.trim(),
+        password,
+        confirmPassword,
+      }).unwrap();
+
+      console.log('Register success:', res);
+
+      router.push({
+        pathname: '/(auth)/OtpVerification',
+        params: { email: email.trim(), purpose: 'register' },
+      });
+    } catch (err: any) {
+      console.log('Register error:', err);
+
+      const message =
+        err?.data?.message ||
+        (err?.status === 'FETCH_ERROR'
+          ? 'Server e connect kora jachhe na. Network check korun.'
+          : 'Registration failed. Abar try korun.');
+
+      // email already exist type error hole email field e dekhano
+      if (/email/i.test(message)) {
+        setEmailError(message);
+      } else {
+        Alert.alert('Error', message);
+      }
     }
   };
 
@@ -160,9 +185,9 @@ export default function Register() {
         )}
 
         <Button
-          text={loading ? 'Creating account...' : 'Create Account'}
+          text={isLoading ? 'Creating account...' : 'Create Account'}
           onPress={handleRegister}
-          loading={loading}
+          loading={isLoading}
         />
       </KeyboardAwareScrollView>
     </SafeAreaView>

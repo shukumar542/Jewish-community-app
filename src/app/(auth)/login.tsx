@@ -1,6 +1,7 @@
 import Button from '@/components/ui/Button';
 import InputField from '@/components/ui/InputField';
 import tw from '@/lib/tw';
+import { useLoginMutation } from '@/services/authApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -16,6 +17,8 @@ export default function Login() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [login, { isLoading }] = useLoginMutation();
+
 
   const validate = () => {
     let valid = true;
@@ -35,11 +38,14 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!validate()) return;
-    router.push('/(tabs)/home' as any);
+    console.log('Login with:', { email, password });
+    // router.push('/(tabs)/home' as any);
 
     setLoading(true);
     try {
       // API call
+      const res = await login({ email, password }).unwrap();
+      console.log(res)
     } catch (e) {
       console.warn(e);
     } finally {

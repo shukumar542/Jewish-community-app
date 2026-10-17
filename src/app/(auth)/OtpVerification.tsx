@@ -1,6 +1,10 @@
 import Button from '@/components/ui/Button';
 import OTPInput, { OTPInputHandle } from '@/components/ui/OtpInput';
+import { saveSession } from '@/lib/authStorage';
 import tw from '@/lib/tw';
+import { useResendOtpMutation, useVerifyOtpMutation } from '@/services/authApi';
+import { setCredentials } from '@/store/authSlice';
+import { useAppDispatch } from '@/store/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
@@ -14,6 +18,10 @@ export default function OtpVerification() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+  const dispatch = useAppDispatch();
+
+  const [verifyOtp, { isLoading }] = useVerifyOtpMutation();
+  const [resendOtp] = useResendOtpMutation();
 
   const handleVerify = async () => {
     if (otp.length !== 6) {
@@ -23,18 +31,23 @@ export default function OtpVerification() {
     setError('');
     setLoading(true);
     try {
-      
 
+      const res = await verifyOtp({ email, otp }).unwrap();
+      const { accessToken, user } = res.data;
+      await saveSession(accessToken, user);
+      dispatch(setCredentials({ token: accessToken, user }));
+      console.log('OTP verified:', res);
       if (purpose === 'forgot-password') {
         router.replace({
-          pathname: '/(auth)/resetNewPassword', 
+          pathname: '/(auth)/resetNewPassword',
           params: { email },
         });
       } else {
         router.replace('/(auth)/login');
       }
     } catch (e: any) {
-      setError(e?.message ?? 'OTP verification failed');
+      console.log(e)
+      setError(e?.data?.message ?? 'OTP verification failed');
     } finally {
       setLoading(false);
     }
@@ -43,7 +56,8 @@ export default function OtpVerification() {
   const handleResend = async () => {
     setResending(true);
     try {
-      // API call করে OTP resend করবে
+      const res = await resendOtp({ email }).unwrap();
+      console.log("res", res)
       otpRef.current?.clear();
       setOtp('');
     } catch (e) {

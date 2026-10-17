@@ -1,6 +1,7 @@
 import { eventCategories } from '@/constants/event-categories';
 import tw from '@/lib/tw';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
@@ -29,11 +30,18 @@ export default function ChooseCategory() {
                 params: { category: item.key },
               })
             }
-            style={tw`flex-row items-center justify-between bg-white border border-gray-200 rounded-2xl px-4 py-4`}
+            style={tw`flex-row items-center justify-between bg-white border border-gray-200 rounded-2xl px-2 py-2 `}
           >
-            <View style={tw`flex-row items-center gap-3`}>
-              <Text style={tw`text-xl`}>{item.icon}</Text>
-              <Text style={tw`text-gray-900 font-semibold text-base`}>{item.label}</Text>
+            <View style={tw`flex-row items-center  gap-3`}>
+              <Image
+                source={item.icon}
+                style={tw`w-16 h-16 rounded-xl`}
+                resizeMode="cover"
+              />
+ 
+              <Text style={tw`text-gray-900 font-semibold text-base`}>
+                {item.label}
+              </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
           </TouchableOpacity>

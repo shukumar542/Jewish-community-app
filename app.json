@@ -11,7 +11,7 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
-       "softwareKeyboardLayoutMode": "pan",
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -33,13 +33,14 @@
           "backgroundColor": "#F7B115",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 320,
-           "dark": {
+          "dark": {
             "backgroundColor": "#F7B115",
             "image": "./assets/images/splash-icon.png"
           }
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

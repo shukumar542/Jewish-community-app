@@ -20,6 +20,7 @@ export const formSchemas: Record<string, EventFormSchema> = {
     "engagement": engagementSchema,
     "bar-mitzvah": barMitzvahSchema,
     'night-before-bris': nightBeforeBrisSchema,
+    'bris': brisRedemptionSchema,
     'bris-redemption': brisRedemptionSchema,
     'matchmaking': matchmakingSchema,
     'comforting-mourners': comfortingMournersSchema,

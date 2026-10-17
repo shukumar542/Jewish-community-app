@@ -1,14 +1,14 @@
 import {
-    coverImageSection,
-    dateTimeSection,
-    fatherSection,
-    locationDetailsSection,
+  coverImageSection,
+  dateTimeSection,
+  fatherSection,
+  locationDetailsSection,
 } from './shared-sections';
 import { EventFormSchema } from './types';
 
 export const shalomZacharBrisSchema: EventFormSchema = {
   category: 'shalom-zachar-bris',
-  title: 'Shalom Zachar / Night Before Bris',
+  title: 'Shalom Zachar',
   sections: [
     coverImageSection,
     fatherSection,
