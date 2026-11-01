@@ -6,11 +6,11 @@ export const coverImageSection: FormSection = {
 };
 
 export const groomSection: FormSection = {
-  title: 'Groom',
+  title: 'Choson',
   fields: [
     {
       key: 'groomName',
-      label: "Groom's Name",
+      label: "Choson Name",
       type: 'text',
       placeholder: 'e.g. David Cohen',
       required: true,
@@ -22,12 +22,12 @@ export const parentInLawSection = (
   number: 1 | 2,
   options?: { simple?: boolean }
 ): FormSection => ({
-  title: `Parent-in-law #${number}`,
+  title: `Mechiten #${number}`,
   fields: options?.simple
     ? [
         {
           key: `parentInLaw${number}FullName`,
-          label: 'Full Name',
+          label: 'Name',
           type: 'text',
           placeholder: number === 1 ? 'e.g. Rabbi Shlomo Levin' : 'e.g. Rabbi Dovid Berger',
           required: true,
@@ -36,20 +36,20 @@ export const parentInLawSection = (
     : [
         {
           key: `parentInLaw${number}FullName`,
-          label: 'Full Name',
+          label: 'Name',
           type: 'text',
           placeholder: 'e.g. Rabbi Moshe Levy',
           required: true,
         },
         {
           key: `parentInLaw${number}SonOfRabbi`,
-          label: 'Son of Rabbi',
+          label: 'Ben R’',
           type: 'text',
           placeholder: 'e.g. Rabbi Yitzchak Levy',
         },
         {
           key: `parentInLaw${number}SonInLawOfRabbi`,
-          label: 'Son-in-law of Rabbi',
+          label: 'Chasan R’ ',
           type: 'text',
           placeholder: 'e.g. Rabbi Avraham Klein',
         },
@@ -66,14 +66,14 @@ export const venueDateSection = (options?: {
   fields: [
     {
       key: 'venueName',
-      label: options?.venueLabel ?? 'Venue Name',
+      label: options?.venueLabel ?? 'Hall Name',
       type: 'text',
       placeholder: options?.venuePlaceholder ?? 'e.g. The Grand Ballroom',
       required: true,
     },
     {
       key: 'venueAddress',
-      label: 'Venue Address',
+      label: 'Address',
       type: 'location',
       placeholder: 'Full address',
       required: true,
@@ -84,11 +84,11 @@ export const venueDateSection = (options?: {
 });
 
 export const barMitzvahBoySection: FormSection = {
-  title: 'Bar Mitzvah Boy',
+  title: 'Bucher',
   fields: [
     {
       key: 'boyName',
-      label: "Boy's Name",
+      label: "Name",
       type: 'text',
       placeholder: 'e.g. Eliyahu Goldstein',
       required: true,
@@ -101,20 +101,20 @@ export const fatherSection: FormSection = {
   fields: [
     {
       key: 'fatherName',
-      label: "Father's Name",
+      label: "Name",
       type: 'text',
       placeholder: 'e.g. Rabbi Menachem Goldstein',
       required: true,
     },
     {
       key: 'fatherSonOfRabbi',
-      label: 'Son of Rabbi',
+      label: 'Ben R’',
       type: 'text',
       placeholder: 'e.g. Rabbi Yisroel Goldstein',
     },
     {
       key: 'fatherSonInLawOfRabbi',
-      label: 'Son-in-law of Rabbi',
+      label: 'Chasan R’',
       type: 'text',
       placeholder: 'e.g. Rabbi Chaim Weiss',
     },
@@ -122,9 +122,11 @@ export const fatherSection: FormSection = {
 };
 
 export const locationDetailsSection = (options?: {
-  includeBrisAddress?: boolean;
+  includeDateTime?: boolean;
+  timeLabel?: string;
+  title?: string;
 }): FormSection => ({
-  title: 'Location Details',
+  title: options?.title ?? 'Venue',
   fields: [
     {
       key: 'gatheringAddress',
@@ -135,24 +137,18 @@ export const locationDetailsSection = (options?: {
     },
     {
       key: 'whoseHouse',
-      label: 'Whose House',
+      label: 'Location Description',
       type: 'text',
-      placeholder: 'e.g. Home of the father',
+      placeholder: 'e.g. Father-in-law’s house',
     },
-    ...(options?.includeBrisAddress
+    ...(options?.includeDateTime
       ? [
-          {
-            key: 'brisAddress',
-            label: 'Bris Address',
-            type: 'location' as const,
-            placeholder: "Address of next day's bris",
-            required: true,
-          },
+          { key: 'eventDate', label: 'Date', type: 'date' as const, required: true },
+          { key: 'eventTime', label: options?.timeLabel ?? 'Time', type: 'time' as const },
         ]
       : []),
   ],
 });
-
 export const dateTimeSection = (options?: {
   timeLabel?: string;
   title?: string;
@@ -164,33 +160,33 @@ export const dateTimeSection = (options?: {
   ],
 });
 
-export const extendedFamilySection = (role: 'Groom' | 'Bride'): FormSection => ({
+export const extendedFamilySection = (role: 'Choson ' | 'Kallah'): FormSection => ({
   title: role,
   fields: [
     {
       key: `${role.toLowerCase()}Name`,
       label: `${role}'s Name`,
       type: 'text',
-      placeholder: role === 'Groom' ? 'e.g. Shimon Rosenberg' : 'e.g. Rivka Weissberg',
+      placeholder: role === 'Choson ' ? 'e.g. Shimon Rosenberg' : 'e.g. Rivka Weissberg',
       required: true,
     },
     {
       key: `${role.toLowerCase()}FatherName`,
       label: "Father's Name",
       type: 'text',
-      placeholder: role === 'Groom' ? 'e.g. Rabbi Aharon Rosenberg' : 'e.g. Rabbi Mordechai Weissberg',
+      placeholder: role === 'Choson ' ? 'e.g. Rabbi Aharon Rosenberg' : 'e.g. Rabbi Mordechai Weissberg',
     },
     {
       key: `${role.toLowerCase()}SonOfRabbi`,
-      label: 'Son of Rabbi',
+      label: 'Ben R’',
       type: 'text',
-      placeholder: role === 'Groom' ? 'e.g. Rabbi Yitzchak Levy' : 'e.g. Rabbi Binyamin Weissberg',
+      placeholder: role === 'Choson ' ? 'e.g. Rabbi Yitzchak Levy' : 'e.g. Rabbi Binyamin Weissberg',
     },
     {
       key: `${role.toLowerCase()}SonInLawOfRabbi`,
-      label: 'Son-in-law of Rabbi',
+      label: 'Chasan R’ ',
       type: 'text',
-      placeholder: role === 'Groom' ? 'e.g. Rabbi Avraham Klein' : 'e.g. Rabbi Yakov Engel',
+      placeholder: role === 'Choson ' ? 'e.g. Rabbi Avraham Klein' : 'e.g. Rabbi Yakov Engel',
     },
   ],
 });
@@ -208,19 +204,43 @@ export const matchmakerDateSection: FormSection = {
     { key: 'eventTime', label: 'Time', type: 'time' },
   ],
 };
+
+export const shadchenSection: FormSection = {
+  title: 'Shadchen',
+  fields: [
+    {
+      key: 'shadchenName',
+      label: 'Shadchen',
+      type: 'text',
+      placeholder: 'e.g. Rabbi Chaim Smelber',
+    },
+  ],
+};
 export const deceasedSection: FormSection = {
-  title: 'Deceased',
+  title: 'Nifter',
   fields: [
     {
       key: 'deceasedName',
-      label: 'Name of Deceased',
+      label: 'Name',
       type: 'text',
       placeholder: 'e.g. Reb Yisroel ben Moshe',
       required: true,
     },
     {
       key: 'deceasedRelation',
-      label: 'Wife of / Son of / Daughter of',
+      label: 'Wife of',
+      type: 'text',
+      placeholder: 'e.g. Son of Rabbi Moshe Greenfeld',
+    },
+    {
+      key: 'deceasedSon',
+      label: 'Son of',
+      type: 'text',
+      placeholder: 'e.g. Son of Rabbi Moshe Greenfeld',
+    },
+    {
+      key: 'Daoughter',
+      label: 'Daughter of',
       type: 'text',
       placeholder: 'e.g. Son of Rabbi Moshe Greenfeld',
     },
@@ -228,19 +248,19 @@ export const deceasedSection: FormSection = {
 };
 
 export const mournersSection: FormSection = {
-  title: 'Mourners',
+  title: 'Aveilim',
   fields: [
     {
       key: 'mournersNames',
-      label: 'Names of Mourners',
+      label: 'Aveilim',
       type: 'textarea',
-      placeholder: "List all mourners' names...",
+      placeholder: "Aveilim ...",
     },
   ],
 };
 
 export const shivaDetailsSection: FormSection = {
-  title: 'Shiva Details',
+  title: 'Location',
   fields: [
     {
       key: 'shivaAddress',
@@ -255,7 +275,7 @@ export const shivaDetailsSection: FormSection = {
       type: 'text',
       placeholder: 'e.g. Thursday evening',
     },
-    { key: 'shivaDate', label: 'Date', type: 'date', required: true },
+    // { key: 'shivaDate', label: 'Date', type: 'date', required: true },
   ],
 };
 export const locationDateSection: FormSection = {
@@ -325,10 +345,11 @@ export const locationScheduleSection: FormSection = {
   ],
 };
 export const locationDateCombinedSection = (options?: {
+  includeTime?: boolean;
   timeLabel?: string;
   addressPlaceholder?: string;
 }): FormSection => ({
-  title: 'Location & Date',
+  title: 'Venue',
   fields: [
     {
       key: 'venueAddress',
@@ -338,12 +359,19 @@ export const locationDateCombinedSection = (options?: {
       required: true,
     },
     {
-      key: 'whoseHouse',
-      label: 'Whose House',
+      key: 'location',
+      label: 'Location Description',
       type: 'text',
-      placeholder: 'e.g. Home of the father',
+      placeholder: 'Father-in-law’s house',
     },
-    { key: 'eventDate', label: 'Date', type: 'date', required: true },
-    { key: 'eventTime', label: options?.timeLabel ?? 'Time', type: 'time' },
+    ...(options?.includeTime ?? true
+      ? [
+          {
+            key: 'eventTime',
+            label: options?.timeLabel ?? 'Time',
+            type: 'time' as const,
+          },
+        ]
+      : []),
   ],
 });

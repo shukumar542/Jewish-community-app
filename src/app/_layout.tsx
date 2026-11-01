@@ -7,8 +7,10 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect } from 'react';
 import { useColorScheme, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { Provider } from 'react-redux';
+import { Toaster } from 'sonner-native';
 import '../global.css';
 import { store } from '../store/store';
 
@@ -18,6 +20,7 @@ function RootNavigator() {
   const colorScheme = useColorScheme();
   const dispatch = useAppDispatch();
   const isHydrated = useAppSelector((s) => s.auth.isHydrated);
+  const token = useAppSelector((s) => s.auth.token)
 
   useEffect(() => {
     async function prepare() {
@@ -43,18 +46,29 @@ function RootNavigator() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <KeyboardProvider>
-        <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(tabs)" />
-          </Stack>
-        </View>
-      </KeyboardProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <KeyboardProvider>
+          <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+            <Stack screenOptions={{ headerShown: false }}>
+
+              <Stack.Protected guard={!!token}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="(settings)" />
+              </Stack.Protected>
+
+
+              <Stack.Protected guard={!token}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(auth)" />
+              </Stack.Protected>
+            </Stack>
+            <Toaster position="top-center" />
+          </View>
+        </KeyboardProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
 

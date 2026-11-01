@@ -1,11 +1,11 @@
-import { coverImageSection, groomSection, parentInLawSection, venueDateSection } from './shared-sections';
+import { groomSection, parentInLawSection, venueDateSection } from './shared-sections';
 import { EventFormSchema } from './types';
 
 export const weddingSchema: EventFormSchema = {
     category: 'wedding',
-    title: 'Wedding',
+    title: 'Chasunah',
     sections: [
-        coverImageSection,
+        // coverImageSection,
         groomSection,
         parentInLawSection(1),
         parentInLawSection(2),

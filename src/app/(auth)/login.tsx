@@ -1,7 +1,10 @@
 import Button from '@/components/ui/Button';
 import InputField from '@/components/ui/InputField';
+import { saveSession } from '@/lib/authStorage';
 import tw from '@/lib/tw';
 import { useLoginMutation } from '@/services/authApi';
+import { setCredentials } from '@/store/authSlice';
+import { useAppDispatch } from '@/store/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -10,18 +13,24 @@ import { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { toast } from 'sonner-native';
 
 export default function Login() {
-  const [email, setEmail] = useState('jhon@example.com');
-  const [password, setPassword] = useState('password123');
+  const dispatch = useAppDispatch();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [login, { isLoading }] = useLoginMutation();
 
+  const [login, { isLoading }] = useLoginMutation();
 
   const validate = () => {
     let valid = true;
+
+    setEmailError('');
+    setPasswordError('');
+
     if (!email.trim()) {
       setEmailError('Email is required');
       valid = false;
@@ -29,27 +38,40 @@ export default function Login() {
       setEmailError('Enter a valid email');
       valid = false;
     }
+
     if (!password.trim()) {
       setPasswordError('Password is required');
       valid = false;
     }
+
     return valid;
   };
 
   const handleLogin = async () => {
     if (!validate()) return;
-    console.log('Login with:', { email, password });
-    // router.push('/(tabs)/home' as any);
 
-    setLoading(true);
     try {
-      // API call
-      const res = await login({ email, password }).unwrap();
-      console.log(res)
-    } catch (e) {
-      console.warn(e);
-    } finally {
-      setLoading(false);
+      const res = await login({
+        email: email.trim(),
+        password,
+      }).unwrap();
+
+      const { accessToken, user } = res.data;
+
+      await saveSession(accessToken, user);
+      dispatch(setCredentials({ token: accessToken, user }));
+
+
+      toast.success(res.message ?? 'Login successful');
+      router.replace('/(tabs)/home');
+    } catch (err: any) {
+      const message =
+        err?.data?.message ||
+        (err?.status === 'FETCH_ERROR'
+          ? 'Network error. Please check your connection.'
+          : 'An unexpected error occurred. Please try again.');
+
+      toast.error(message);
     }
   };
 
@@ -114,7 +136,11 @@ export default function Login() {
         </TouchableOpacity>
 
         {/* Login Button */}
-        <Button text={loading ? 'Signing in...' : 'Sign In'} onPress={handleLogin} loading={loading} />
+        <Button
+          text={isLoading ? 'Signing in...' : 'Sign In'}
+          onPress={handleLogin}
+          loading={isLoading}
+        />
 
         {/* Register Link */}
         <View style={tw`flex-row items-center justify-center mt-4`}>

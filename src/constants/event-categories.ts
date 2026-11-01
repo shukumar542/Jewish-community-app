@@ -21,26 +21,22 @@ export interface EventCategory {
 }
 
 export const eventCategories: EventCategory[] = [
-  { key: 'wedding', label: 'Wedding', icon: Chasunah },
-  { key: 'seven-blessings', label: 'Seven Blessings', icon: ShevaBerachos },
-  { key: 'engagement', label: 'Engagement Agreement', icon: Tenoyim },
+  { key: 'wedding', label: 'Chasunah', icon: Chasunah },
+  { key: 'seven-blessings', label: 'Sheva Broches', icon: ShevaBerachos },
+  { key: 'engagement', label: 'Tenoyim', icon: Tenoyim },
   { key: 'bar-mitzvah', label: 'Bar Mitzvah', icon: BarMitzvah },
-  { key: 'night-before-bris', label: 'Night Before Bris', icon: Vochnocht },
+  { key: 'night-before-bris', label: 'Vach Nacht', icon: Vochnocht },
   { key: 'bris', label: 'Bris', icon: Bris },
-  { key: 'bris-redemption', label: 'Bris / Redemption', icon: PidyonHaben },
-  { key: 'matchmaking', label: 'Matchmaking', icon: Shidduch },
-  { key: 'comforting-mourners', label: 'Comforting Mourners', icon: NichumAveilim },
-  { key: 'shalom-zachar', label: 'Shalom Zachar', icon: Zucher },
-  { key: 'kiddush', label: 'Kiddush', icon: Kiddish },
-  {
-    key: 'shalom-zachar-bris',
-    label: 'Shalom Zachar',
-    icon: ZucherVochnocht,
-  },
-  { key: 'aufruf', label: 'Aufruf', icon: BavarfenShtreimel },
+  { key: 'bris-redemption', label: 'Bris / Pidyon Haben', icon: PidyonHaben },
+  { key: 'matchmaking', label: 'Shidduch', icon: Shidduch },
+  { key: 'comforting-mourners', label: 'Nichum Aveilim', icon: NichumAveilim },
+  { key: 'shalom-zachar', label: 'Shulem Zucher', icon: Zucher },
+  { key: 'kiddush', label: ' Kiddish', icon: Kiddish },
+  { key: 'shalom-zachar-bris',label: 'Zucher Vach Nacht ',icon: ZucherVochnocht},
+  { key: 'aufruf', label: 'Bavarfen', icon: BavarfenShtreimel },
   {
     key: 'sabbath-seven-blessings',
-    label: 'Sabbath Seven Blessings',
+    label: 'Shabbos Sheva Broches',
     icon: ShabbosShevaBerachos,
   },
 ];

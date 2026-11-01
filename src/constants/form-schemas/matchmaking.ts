@@ -1,13 +1,14 @@
-import { coverImageSection, extendedFamilySection, matchmakerDateSection } from './shared-sections';
+import { extendedFamilySection, shadchenSection } from './shared-sections';
 import { EventFormSchema } from './types';
 
 export const matchmakingSchema: EventFormSchema = {
   category: 'matchmaking',
-  title: 'Matchmaking',
+  title: 'Shidduch',
   sections: [
-    coverImageSection,
-    extendedFamilySection('Groom'),
-    extendedFamilySection('Bride'),
-    matchmakerDateSection,
+    // coverImageSection,
+    extendedFamilySection('Choson '),
+    extendedFamilySection('Kallah'),
+    // matchmakerDateSection,
+     shadchenSection,
   ],
 };

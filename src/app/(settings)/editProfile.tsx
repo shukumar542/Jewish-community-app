@@ -2,26 +2,55 @@ import BackButton from '@/components/ui/BackButton';
 import Button from '@/components/ui/Button';
 import InputField from '@/components/ui/InputField';
 import tw from '@/lib/tw';
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from '@/services/settingsApi';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { MapPin, Phone, User } from 'lucide-react-native';
-import { useState } from 'react';
-import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { toast } from 'sonner-native';
 
 export default function ProfileSetting() {
-  const [name, setName] = useState('Shukumar');
-  const [phone, setPhone] = useState('+16462713111');
-  const [address, setAddress] = useState('123 Main Street, Dhaka');
-  const [avatar, setAvatar] = useState<string | null>(
-    'https://images.unsplash.com/photo-1633332755192-727a05c4013d'
-  );
-  const [loading, setLoading] = useState(false);
+  const {data ,error,  isLoading: isFetching, isError, refetch } = useGetProfileQuery();
+  const [updateProfile, { isLoading: isSaving }] = useUpdateProfileMutation();
+
+
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [pickedImage, setPickedImage] =
+    useState<ImagePicker.ImagePickerAsset | null>(null);
+
+  useEffect(() => {
+    const profile = data?.data;
+    if (!profile) return;
+    setName(profile.fullName ?? '');
+    setPhone(profile.phoneNumber ?? '');
+    setAddress(profile.address ?? '');
+    setAvatar(profile.picture ?? null);
+    setPickedImage(null);
+  }, [data]);
+
+
+  console.log('profile error:', data);
+
 
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      alert('Photo library access is needed to change your profile picture.');
+      toast.error('Photo library access is needed to change your picture.');
       return;
     }
 
@@ -33,19 +62,63 @@ export default function ProfileSetting() {
     });
 
     if (!result.canceled && result.assets?.[0]) {
+      setPickedImage(result.assets[0]);
       setAvatar(result.assets[0].uri);
     }
   };
 
   const handleSave = async () => {
-    setLoading(true);
+    if (!name.trim()) {
+      toast.error('Full name is required');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('fullName', name.trim());
+    formData.append('phoneNumber', phone.trim());
+    formData.append('address', address.trim());
+
+    // Notun image select korle-i picture pathabo
+    if (pickedImage) {
+      const uri = pickedImage.uri;
+      const ext = uri.split('.').pop()?.toLowerCase() ?? 'jpg';
+      formData.append('picture', {
+        uri,
+        name: pickedImage.fileName ?? `profile.${ext}`,
+        type: pickedImage.mimeType ?? `image/${ext === 'jpg' ? 'jpeg' : ext}`,
+      } as any);
+    }
+
     try {
-    } catch (e) {
-      console.warn(e);
-    } finally {
-      setLoading(false);
+      const res = await updateProfile(formData).unwrap();
+      toast.success(res.message ?? 'Profile updated');
+    } catch (err: any) {
+      const message =
+        err?.data?.message ||
+        (err?.status === 'FETCH_ERROR'
+          ? 'Server e connect kora jachhe na. Network check korun.'
+          : 'Profile update hoyni. Abar try korun.');
+      toast.error(message);
     }
   };
+
+  if (isFetching) {
+    return (
+      <SafeAreaView style={tw`flex-1 bg-white items-center justify-center`}>
+        <ActivityIndicator size="large" color="#f59e0b" />
+      </SafeAreaView>
+    );
+  }
+
+
+  if (isError) {
+    return (
+      <SafeAreaView style={tw`flex-1 bg-white items-center justify-center px-5`}>
+        <Text style={tw`text-gray-500 mb-4`}>Profile load hoyni</Text>
+        <Button text="Retry" onPress={refetch} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`} edges={['top', 'bottom']}>
@@ -59,10 +132,18 @@ export default function ProfileSetting() {
         {/* Avatar */}
         <View style={tw`items-center mb-8`}>
           <View style={tw`relative`}>
-            <Image
-              source={{ uri: avatar ?? undefined }}
-              style={tw`w-24 h-24 rounded-full bg-gray-100`}
-            />
+            {avatar ? (
+              <Image
+                source={{ uri: avatar }}
+                style={tw`w-24 h-24 rounded-full bg-gray-100`}
+              />
+            ) : (
+              <View
+                style={tw`w-24 h-24 rounded-full bg-gray-100 items-center justify-center`}
+              >
+                <Ionicons name="person" size={40} color="#9ca3af" />
+              </View>
+            )}
             <TouchableOpacity
               onPress={pickImage}
               style={tw`absolute bottom-0 right-0 w-8 h-8 rounded-full bg-amber-500 items-center justify-center border-2 border-white`}
@@ -72,7 +153,6 @@ export default function ProfileSetting() {
           </View>
         </View>
 
-        {/* Form Fields */}
         <InputField
           label="Full Name"
           Icon={User}
@@ -100,7 +180,11 @@ export default function ProfileSetting() {
       </ScrollView>
 
       <View style={tw`px-5 pb-4 pt-2 border-t border-gray-100`}>
-        <Button text={loading ? 'Saving...' : 'Save'} onPress={handleSave} loading={loading} />
+        <Button
+          text={isSaving ? 'Saving...' : 'Save'}
+          onPress={handleSave}
+          loading={isSaving}
+        />
       </View>
     </SafeAreaView>
   );

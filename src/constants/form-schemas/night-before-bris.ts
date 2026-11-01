@@ -1,16 +1,14 @@
 import {
-    coverImageSection,
-    dateTimeSection,
-    fatherSection,
-    locationDetailsSection,
+  dateTimeSection,
+  fatherSection,
+  locationDetailsSection,
 } from './shared-sections';
 import { EventFormSchema } from './types';
 
 export const nightBeforeBrisSchema: EventFormSchema = {
   category: 'night-before-bris',
-  title: 'Night Before Bris',
+  title: 'Vach Nacht',
   sections: [
-    coverImageSection,
     fatherSection,
     locationDetailsSection({ includeBrisAddress: true }),
     dateTimeSection({ timeLabel: 'Morning Prayer Time' }),

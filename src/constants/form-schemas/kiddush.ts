@@ -1,12 +1,11 @@
-import { coverImageSection, fatherSection, locationDateCombinedSection } from './shared-sections';
+import { fatherSection, locationDateCombinedSection } from './shared-sections';
 import { EventFormSchema } from './types';
 
 export const kiddushSchema: EventFormSchema = {
-  category: 'kiddush',
-  title: 'Kiddush',
+  category: 'kiddish',
+  title: 'Kiddish',
   sections: [
-    coverImageSection,
     fatherSection,
-    locationDateCombinedSection({ timeLabel: 'Morning Prayer Time' }),
+    locationDateCombinedSection({ timeLabel: 'Zman Shachris' }),
   ],
 };

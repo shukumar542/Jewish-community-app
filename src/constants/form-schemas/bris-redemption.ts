@@ -1,18 +1,15 @@
 import {
-    coverImageSection,
-    dateTimeSection,
-    fatherSection,
-    locationDetailsSection,
+  fatherSection,
+  locationDetailsSection
 } from './shared-sections';
 import { EventFormSchema } from './types';
 
 export const brisRedemptionSchema: EventFormSchema = {
   category: 'bris-redemption',
-  title: 'Bris / Redemption',
+  title: 'Bris',
   sections: [
-    coverImageSection,
     fatherSection,
-    locationDetailsSection(),
-    dateTimeSection({ title: 'Venue & Date' }),
+    locationDetailsSection({ includeDateTime: true, title: 'Venue' , timeLabel : "Zman Shachris"}),
+    // dateTimeSection({ title: 'Venue & Date' }),
   ],
 };

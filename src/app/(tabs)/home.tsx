@@ -1,6 +1,7 @@
 import EventCard from '@/components/ui/EventCard';
 import { useDebouncedRouter } from '@/hooks/useDebouncedRouter';
 import tw from '@/lib/tw';
+import { useAppSelector } from '@/store/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -43,6 +44,10 @@ const events = [
 
 export default function Home() {
     const { push } = useDebouncedRouter();
+
+    const auth = useAppSelector((s) => s?.auth?.user);
+
+    console.log("auth" , auth?.fullName)
   
   const [activeTimeFilter, setActiveTimeFilter] = useState('Today');
   const [activeCategory, setActiveCategory] = useState('All');
@@ -54,7 +59,7 @@ export default function Home() {
         {/* Header */}
         <View style={tw`flex-row items-center justify-between px-5 pt-4 pb-2`}>
           <View>
-            <Text style={tw`text-gray-500 text-base`}>Moshe! 👋</Text>
+            <Text style={tw`text-gray-500 text-base`}>{auth?.fullName ?? 'Guest'}! 👋</Text>
             <Text style={tw`text-2xl font-bold text-gray-900 mt-1`}>
               Discover Celebrations
             </Text>
