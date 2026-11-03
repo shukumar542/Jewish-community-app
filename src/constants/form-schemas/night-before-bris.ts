@@ -1,7 +1,6 @@
 import {
-  dateTimeSection,
   fatherSection,
-  locationDetailsSection,
+  locationDetailsSection
 } from './shared-sections';
 import { EventFormSchema } from './types';
 
@@ -10,7 +9,8 @@ export const nightBeforeBrisSchema: EventFormSchema = {
   title: 'Vach Nacht',
   sections: [
     fatherSection,
-    locationDetailsSection({ includeBrisAddress: true }),
-    dateTimeSection({ timeLabel: 'Morning Prayer Time' }),
+    locationDetailsSection({ title : "Vach Nacht Venue" , includeDateTime : true }),
+    locationDetailsSection({ title : "Bris Venue" , includeTime : true , timeLabel : 'Zman Shachris'}),
+    // dateTimeSection({ timeLabel: 'Morning Prayer Time' }),
   ],
 };

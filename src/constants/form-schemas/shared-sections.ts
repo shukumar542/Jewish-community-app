@@ -123,6 +123,7 @@ export const fatherSection: FormSection = {
 
 export const locationDetailsSection = (options?: {
   includeDateTime?: boolean;
+  includeTime ? : boolean;
   timeLabel?: string;
   title?: string;
 }): FormSection => ({
@@ -144,6 +145,11 @@ export const locationDetailsSection = (options?: {
     ...(options?.includeDateTime
       ? [
           { key: 'eventDate', label: 'Date', type: 'date' as const, required: true },
+          { key: 'eventTime', label: options?.timeLabel ?? 'Time', type: 'time' as const },
+        ]
+      : []),
+    ...(options?.includeTime
+      ? [
           { key: 'eventTime', label: options?.timeLabel ?? 'Time', type: 'time' as const },
         ]
       : []),
@@ -272,7 +278,7 @@ export const shivaDetailsSection: FormSection = {
     {
       key: 'shivaSittingUntil',
       label: 'Sitting Until',
-      type: 'text',
+      type: 'date',
       placeholder: 'e.g. Thursday evening',
     },
     // { key: 'shivaDate', label: 'Date', type: 'date', required: true },
