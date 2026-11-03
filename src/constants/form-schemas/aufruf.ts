@@ -3,7 +3,7 @@ import { EventFormSchema } from './types';
 
 export const aufrufSchema: EventFormSchema = {
   category: 'aufruf',
-  title: 'Aufruf',
+  title: 'Bavarfen',
   sections: [
     // coverImageSection, 
     groomSection, 

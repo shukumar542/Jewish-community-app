@@ -7,11 +7,11 @@ import { EventFormSchema } from './types';
 
 export const shalomZacharBrisSchema: EventFormSchema = {
   category: 'shalom-zachar-bris',
-  title: 'Shalom Zachar',
+  title: 'Shulem Zucher',
   sections: [
     // coverImageSection,
     fatherSection,
-    locationDetailsSection({ includeBrisAddress: true }),
+    locationDetailsSection(),
     dateTimeSection({ title: 'Date & Time', timeLabel: 'Morning Prayer Time' }),
   ],
 };

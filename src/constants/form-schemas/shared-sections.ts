@@ -279,7 +279,7 @@ export const shivaDetailsSection: FormSection = {
   ],
 };
 export const locationDateSection: FormSection = {
-  title: 'Location & Date',
+  title: 'Venue',
   fields: [
     {
       key: 'venueAddress',
@@ -290,27 +290,27 @@ export const locationDateSection: FormSection = {
     },
     {
       key: 'whoseHouse',
-      label: 'Whose House',
+      label: 'Loaction Description',
       type: 'text',
-      placeholder: 'e.g. Host family residence',
+      placeholder: 'e.g. Father-in-law’s house',
     },
     { key: 'eventDate', label: 'Date', type: 'date', required: true },
   ],
 };
 
 export const familiesSection: FormSection = {
-  title: 'Families',
+  title: 'Mechitunim',
   fields: [
     {
       key: 'parentInLaw1Name',
-      label: 'Parent-in-law #1 Name',
+      label: 'Choson’s Father',
       type: 'text',
       placeholder: 'e.g. Rabbi Boruch Lefkowitz',
       required: true,
     },
     {
       key: 'parentInLaw2Name',
-      label: 'Parent-in-law #2 Name',
+      label: 'Kallah’s Father',
       type: 'text',
       placeholder: 'e.g. Rabbi Alter Schwartz',
       required: true,
@@ -319,7 +319,7 @@ export const familiesSection: FormSection = {
 };
 
 export const locationScheduleSection: FormSection = {
-  title: 'Location & Schedule',
+  title: 'Venue',
   fields: [
     {
       key: 'venueAddress',
@@ -330,12 +330,12 @@ export const locationScheduleSection: FormSection = {
     },
     {
       key: 'whoseHouse',
-      label: 'Whose House',
+      label: 'Location Description',
       type: 'text',
-      placeholder: "e.g. Home of the groom's father",
+      placeholder: "e.g. Father-in-law’s house",
     },
-    { key: 'eventDate', label: 'Date', type: 'date', required: true },
-    { key: 'morningPrayerTime', label: 'Morning Prayer Time', type: 'time' },
+    { key: 'date', label: 'Date', type: 'date', required: true },
+    { key: 'eventDate', label: 'Zman Shachris', type: 'date', required: true },
     {
       key: 'ladiesKiddush',
       label: "Ladies' Kiddush (optional)",

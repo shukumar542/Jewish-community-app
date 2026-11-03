@@ -3,7 +3,7 @@ import { EventFormSchema } from './types';
 
 export const sabbathSevenBlessingsSchema: EventFormSchema = {
   category: 'sabbath-seven-blessings',
-  title: 'Sabbath Seven Blessings',
+  title: 'Shabbos Sheva Broches',
   sections: [
     // coverImageSection,
     parentInLawSection(1, { simple: true }),

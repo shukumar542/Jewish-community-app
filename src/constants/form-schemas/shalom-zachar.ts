@@ -3,7 +3,7 @@ import { EventFormSchema } from './types';
 
 export const shalomZacharSchema: EventFormSchema = {
   category: 'shalom-zachar',
-  title: 'Shalom Zachar',
+  title: 'Shulem Zucher',
   sections: [
     // coverImageSection,
     fatherSection,
