@@ -43,12 +43,12 @@ const events = [
 ];
 
 export default function Home() {
-    const { push } = useDebouncedRouter();
+  const { push } = useDebouncedRouter();
 
-    const auth = useAppSelector((s) => s?.auth?.user);
+  const auth = useAppSelector((s) => s?.auth?.user);
 
-    console.log("auth" , auth?.fullName)
-  
+  console.log("auth", auth?.fullName)
+
   const [activeTimeFilter, setActiveTimeFilter] = useState('Today');
   const [activeCategory, setActiveCategory] = useState('All');
 
@@ -59,9 +59,9 @@ export default function Home() {
         {/* Header */}
         <View style={tw`flex-row items-center justify-between px-5 pt-4 pb-2`}>
           <View>
-            <Text style={tw`text-gray-500 text-base`}>{auth?.fullName ?? 'Guest'}! 👋</Text>
+            {/* <Text style={tw`text-gray-500 text-base`}>{auth?.fullName ?? 'Guest'}! 👋</Text> */}
             <Text style={tw`text-2xl font-bold text-gray-900 mt-1`}>
-              Discover Celebrations
+              Discover
             </Text>
           </View>
           <TouchableOpacity
@@ -73,15 +73,20 @@ export default function Home() {
         </View>
 
         {/* Time Filters */}
-        <View style={tw`flex-row px-3 mt-2 gap-2`}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={tw`gap-3 px-3 `}
+        >
           {timeFilters.map((filter) => (
             <TouchableOpacity
               key={filter}
               onPress={() => setActiveTimeFilter(filter)}
-              style={tw`flex-1 py-2 rounded-full items-center ${activeTimeFilter === filter ? 'bg-amber-500' : 'bg-gray-100'
+              style={tw` py-2 px-5 flex-row rounded-full  ${activeTimeFilter === filter ? 'bg-amber-500' : 'bg-gray-100'
                 }`}
             >
               <Text
+              numberOfLines={1}
                 style={tw`text-sm font-semibold ${activeTimeFilter === filter ? 'text-white' : 'text-gray-600'
                   }`}
               >
@@ -89,7 +94,7 @@ export default function Home() {
               </Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
 
         {/* Category Filters */}
         <ScrollView
