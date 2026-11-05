@@ -47,7 +47,7 @@ export default function Home() {
 
   const auth = useAppSelector((s) => s?.auth?.user);
 
-  console.log("auth", auth?.fullName)
+  console.log("auth", auth)
 
   const [activeTimeFilter, setActiveTimeFilter] = useState('Today');
   const [activeCategory, setActiveCategory] = useState('All');

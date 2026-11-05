@@ -114,7 +114,7 @@ export default function ProfileSetting() {
   if (isError) {
     return (
       <SafeAreaView style={tw`flex-1 bg-white items-center justify-center px-5`}>
-        <Text style={tw`text-gray-500 mb-4`}>Profile load hoyni</Text>
+        <Text style={tw`text-gray-500 mb-4`}>Please try agani !!</Text>
         <Button text="Retry" onPress={refetch} />
       </SafeAreaView>
     );

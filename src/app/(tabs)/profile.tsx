@@ -1,10 +1,25 @@
+import { clearSession } from '@/lib/authStorage';
 import tw from '@/lib/tw';
+import { authApi, useLogoutMutation } from '@/services/authApi';
+import { settingsApi } from '@/services/settingsApi';
+import { logout as logoutAction } from '@/store/authSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useRef } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { toast } from 'sonner-native';
 
 const stats = [
   { label: 'Events Saved', value: 4 },
@@ -12,11 +27,36 @@ const stats = [
   { label: 'Approved', value: 1 },
 ];
 
-
-
 export default function Profile() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user);
   const isNavigating = useRef(false);
+
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      const res = await logoutMutation().unwrap();
+      toast.success(res?.message || 'Logged out successfully');
+    } catch (err: any) {
+      console.warn('Logout API error:', err);
+      const message =
+        err?.data?.message ||
+        (err?.status === 'FETCH_ERROR'
+          ? 'Network error. Logged out locally.'
+          : 'Logged out successfully');
+      toast.info(message);
+    } finally {
+      await clearSession();
+      dispatch(logoutAction());
+      dispatch(authApi.util.resetApiState());
+      dispatch(settingsApi.util.resetApiState());
+      setShowLogoutModal(false);
+      router.replace('/(auth)/login' as any);
+    }
+  };
 
   const navigateOnce = (path: string) => {
     if (isNavigating.current) return;
@@ -53,8 +93,12 @@ export default function Profile() {
             style={tw`w-14 h-14 rounded-xl `}
           />
           <View style={tw`ml-3`}>
-            <Text style={tw`text-lg font-bold text-gray-900`}>Nahid</Text>
-            <Text style={tw`text-gray-400 text-sm`}>nahid@gmail.com</Text>
+            <Text style={tw`text-lg font-bold text-gray-900`}>
+              {user?.fullName || 'Nahid'}
+            </Text>
+            <Text style={tw`text-gray-400 text-sm`}>
+              {user?.email || 'nahid@gmail.com'}
+            </Text>
           </View>
         </View>
 
@@ -91,12 +135,75 @@ export default function Profile() {
 
         {/* Logout Button */}
         <TouchableOpacity
+          onPress={() => setShowLogoutModal(true)}
           style={tw`flex-row items-center justify-center gap-2 border border-amber-400 rounded-full py-3.5`}
         >
           <Ionicons name="log-out-outline" size={18} color="#f59e0b" />
           <Text style={tw`text-amber-500 font-semibold text-base`}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showLogoutModal}
+        onRequestClose={() => {
+          if (!isLoggingOut) setShowLogoutModal(false);
+        }}
+      >
+        <Pressable
+          style={tw`flex-1 bg-black/50 justify-center items-center px-6`}
+          onPress={() => {
+            if (!isLoggingOut) setShowLogoutModal(false);
+          }}
+        >
+          <Pressable
+            style={tw`w-full max-w-sm bg-white rounded-3xl p-6 items-center shadow-lg`}
+            onPress={(e) => e.stopPropagation()}
+          >
+            {/* Icon */}
+            <View
+              style={tw`w-16 h-16 rounded-full bg-amber-50 items-center justify-center mb-4 border border-amber-100`}
+            >
+              <Ionicons name="log-out-outline" size={30} color="#f59e0b" />
+            </View>
+
+            {/* Title & Description */}
+            <Text style={tw`text-xl font-bold text-gray-900 mb-2 text-center`}>
+              Log Out
+            </Text>
+            <Text style={tw`text-gray-500 text-sm text-center mb-6 leading-5`}>
+              Are you sure you want to log out? You will need to login again to access your account.
+            </Text>
+
+            {/* Action Buttons */}
+            <View style={tw`flex-row gap-3 w-full`}>
+              <TouchableOpacity
+                disabled={isLoggingOut}
+                onPress={() => setShowLogoutModal(false)}
+                style={tw`flex-1 border border-gray-300 py-3.5 rounded-full items-center justify-center`}
+              >
+                <Text style={tw`text-gray-700 font-semibold text-base`}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                disabled={isLoggingOut}
+                onPress={handleLogout}
+                style={tw`flex-1 bg-amber-500 py-3.5 rounded-full items-center justify-center ${
+                  isLoggingOut ? 'opacity-70' : ''
+                }`}
+              >
+                {isLoggingOut ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  <Text style={tw`text-white font-semibold text-base`}>Logout</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }

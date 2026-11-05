@@ -36,6 +36,12 @@ export interface VerifyOtpResponse {
   };
 }
 
+export interface LogoutResponse {
+  success?: boolean;
+  message?: string;
+  data?: unknown;
+}
+
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery,
@@ -72,7 +78,15 @@ export const authApi = createApi({
         body,
       }),
     }),
+
+    // User Logout
+    logout: builder.mutation<LogoutResponse, void>({
+      query: () => ({
+        url: '/auth/logout',
+        method: 'POST',
+      }),
+    }),
   }),
 });
 
-export const { useRegisterMutation, useVerifyOtpMutation, useResendOtpMutation, useLoginMutation } = authApi;
+export const { useRegisterMutation, useVerifyOtpMutation, useResendOtpMutation, useLoginMutation, useLogoutMutation } = authApi;
