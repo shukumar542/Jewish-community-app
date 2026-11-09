@@ -31,6 +31,7 @@ export default function Profile() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
+  const isGuest = useAppSelector((state) => state.auth.isGuest);
   const isNavigating = useRef(false);
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -38,8 +39,12 @@ export default function Profile() {
 
   const handleLogout = async () => {
     try {
-      const res = await logoutMutation().unwrap();
-      toast.success(res?.message || 'Logged out successfully');
+      if (!isGuest) {
+        const res = await logoutMutation().unwrap();
+        toast.success(res?.message || 'Logged out successfully');
+      } else {
+        toast.success('Exited guest mode');
+      }
     } catch (err: any) {
       console.warn('Logout API error:', err);
       const message =
@@ -94,10 +99,10 @@ export default function Profile() {
           />
           <View style={tw`ml-3`}>
             <Text style={tw`text-lg font-bold text-gray-900`}>
-              {user?.fullName || 'Nahid'}
+              {user?.fullName || (isGuest ? 'Guest User' : 'Nahid')}
             </Text>
             <Text style={tw`text-gray-400 text-sm`}>
-              {user?.email || 'nahid@gmail.com'}
+              {user?.email || (isGuest ? 'Browsing as Guest' : 'nahid@gmail.com')}
             </Text>
           </View>
         </View>
@@ -133,13 +138,26 @@ export default function Profile() {
           ))}
         </View>
 
+        {/* If Guest, show Sign In option */}
+        {isGuest && (
+          <TouchableOpacity
+            onPress={() => router.push('/(auth)/login' as any)}
+            style={tw`flex-row items-center justify-center gap-2 bg-amber-500 rounded-full py-3.5 mb-3`}
+          >
+            <Ionicons name="log-in-outline" size={18} color="#ffffff" />
+            <Text style={tw`text-white font-semibold text-base`}>Sign In / Register</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Logout Button */}
         <TouchableOpacity
           onPress={() => setShowLogoutModal(true)}
           style={tw`flex-row items-center justify-center gap-2 border border-amber-400 rounded-full py-3.5`}
         >
           <Ionicons name="log-out-outline" size={18} color="#f59e0b" />
-          <Text style={tw`text-amber-500 font-semibold text-base`}>Logout</Text>
+          <Text style={tw`text-amber-500 font-semibold text-base`}>
+            {isGuest ? 'Exit Guest Mode' : 'Logout'}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -171,10 +189,12 @@ export default function Profile() {
 
             {/* Title & Description */}
             <Text style={tw`text-xl font-bold text-gray-900 mb-2 text-center`}>
-              Log Out
+              {isGuest ? 'Exit Guest Mode' : 'Log Out'}
             </Text>
             <Text style={tw`text-gray-500 text-sm text-center mb-6 leading-5`}>
-              Are you sure you want to log out? You will need to login again to access your account.
+              {isGuest
+                ? 'Are you sure you want to exit guest mode and return to the welcome screen?'
+                : 'Are you sure you want to log out? You will need to login again to access your account.'}
             </Text>
 
             {/* Action Buttons */}
@@ -197,7 +217,9 @@ export default function Profile() {
                 {isLoggingOut ? (
                   <ActivityIndicator size="small" color="#ffffff" />
                 ) : (
-                  <Text style={tw`text-white font-semibold text-base`}>Logout</Text>
+                  <Text style={tw`text-white font-semibold text-base`}>
+                    {isGuest ? 'Exit' : 'Logout'}
+                  </Text>
                 )}
               </TouchableOpacity>
             </View>

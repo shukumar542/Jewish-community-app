@@ -7,6 +7,8 @@ export const barMitzvahSchema: EventFormSchema = {
     sections: [
         barMitzvahBoySection,
         fatherSection,
-        venueDateSection()
+        venueDateSection({
+            venuePlaceholder: 'e.g. Kiryas Joel Hall',
+        })
     ],
 };

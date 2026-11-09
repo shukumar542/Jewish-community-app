@@ -36,7 +36,7 @@ export default function ChooseCategory() {
               <Image
                 source={item.icon}
                 style={tw`w-16 h-16 rounded-xl`}
-                resizeMode="cover"
+                contentFit="cover"
               />
  
               <Text style={tw`text-gray-900 font-semibold text-base`}>

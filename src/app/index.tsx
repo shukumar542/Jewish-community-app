@@ -1,10 +1,19 @@
 import Button from '@/components/ui/Button';
 import tw from '@/lib/tw';
+import { setGuest } from '@/store/authSlice';
+import { useAppDispatch } from '@/store/hooks';
 import { router } from 'expo-router';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Index() {
+  const dispatch = useAppDispatch();
+
+  const handleGuestLogin = () => {
+    dispatch(setGuest(true));
+    router.replace('/(tabs)/home');
+  };
+
   return (
     <View style={tw`flex-1 bg-white`}>
       {/* Hero Image Section */}
@@ -46,7 +55,7 @@ export default function Index() {
             </TouchableOpacity>
 
             {/* Guest User */}
-            <TouchableOpacity onPress={() => router.push("/(tabs)/home")} style={tw`items-center pt-2`}>
+            <TouchableOpacity onPress={handleGuestLogin} style={tw`items-center pt-2`}>
               <Text style={tw`text-amber-500 font-semibold text-base`}>Guest User</Text>
             </TouchableOpacity>
 

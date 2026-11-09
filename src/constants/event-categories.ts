@@ -23,7 +23,7 @@ export interface EventCategory {
 export const eventCategories: EventCategory[] = [
   { key: 'wedding', label: 'Chasunah', icon: Chasunah },
   { key: 'seven-blessings', label: 'Sheva Broches', icon: ShevaBerachos },
-  { key: 'engagement', label: 'Tenoyim', icon: Tenoyim },
+  { key: 'tenoyim', label: 'Tenoyim', icon: Tenoyim },
   { key: 'bar-mitzvah', label: 'Bar Mitzvah', icon: BarMitzvah },
   { key: 'night-before-bris', label: 'Vach Nacht', icon: Vochnocht },
   { key: 'bris', label: 'Bris', icon: Bris },
@@ -34,9 +34,5 @@ export const eventCategories: EventCategory[] = [
   { key: 'kiddush', label: ' Kiddish', icon: Kiddish },
   { key: 'shalom-zachar-bris',label: 'Zucher Vach Nacht ',icon: ZucherVochnocht},
   { key: 'aufruf', label: 'Bavarfen', icon: BavarfenShtreimel },
-  {
-    key: 'sabbath-seven-blessings',
-    label: 'Shabbos Sheva Broches',
-    icon: ShabbosShevaBerachos,
-  },
+  { key: 'sabbath-seven-blessings', label: 'Shabbos Sheva Broches', icon: ShabbosShevaBerachos,},
 ];

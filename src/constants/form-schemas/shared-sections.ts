@@ -9,7 +9,7 @@ export const groomSection: FormSection = {
   title: 'Choson',
   fields: [
     {
-      key: 'groomName',
+      key: 'chosonName',
       label: "Choson Name",
       type: 'text',
       placeholder: 'e.g. David Cohen',
@@ -26,32 +26,32 @@ export const parentInLawSection = (
   fields: options?.simple
     ? [
         {
-          key: `parentInLaw${number}FullName`,
+          key: `mechiten${number}Name`,
           label: 'Name',
           type: 'text',
-          placeholder: number === 1 ? 'e.g. Rabbi Shlomo Levin' : 'e.g. Rabbi Dovid Berger',
+          placeholder: number === 1 ? 'e.g. Rabbi Boruch Lefkowitz' : 'e.g. Rabbi Alter Schwartz',
           required: true,
         },
       ]
     : [
         {
-          key: `parentInLaw${number}FullName`,
+          key: `mechiten${number}Name`,
           label: 'Name',
           type: 'text',
-          placeholder: 'e.g. Rabbi Moshe Levy',
+          placeholder: number === 1 ? 'e.g. Rabbi Boruch Lefkowitz' : 'e.g. Rabbi Alter Schwartz',
           required: true,
         },
         {
-          key: `parentInLaw${number}SonOfRabbi`,
+          key: `mechiten${number}BenR`,
           label: 'Ben R’',
           type: 'text',
-          placeholder: 'e.g. Rabbi Yitzchak Levy',
+          placeholder: number === 1 ? 'e.g. Rabbi Yisroel Lefkowitz' : 'e.g. Rabbi Shimon Schwartz',
         },
         {
-          key: `parentInLaw${number}SonInLawOfRabbi`,
+          key: `mechiten${number}ChasanR`,
           label: 'Chasan R’ ',
           type: 'text',
-          placeholder: 'e.g. Rabbi Avraham Klein',
+          placeholder: number === 1 ? 'e.g. Rabbi Chaim Weiss' : 'e.g. Rabbi Moshe Green',
         },
       ],
 });
@@ -62,24 +62,24 @@ export const venueDateSection = (options?: {
   venuePlaceholder?: string;
   timeLabel?: string;
 }): FormSection => ({
-  title: 'Venue & Date',
+  title: 'Venue',
   fields: [
     {
-      key: 'venueName',
+      key: 'hallName',
       label: options?.venueLabel ?? 'Hall Name',
       type: 'text',
       placeholder: options?.venuePlaceholder ?? 'e.g. The Grand Ballroom',
       required: true,
     },
     {
-      key: 'venueAddress',
+      key: 'address',
       label: 'Address',
       type: 'location',
       placeholder: 'Full address',
       required: true,
     },
-    { key: 'eventDate', label: 'Date', type: 'date', required: true },
-    { key: 'eventTime', label: options?.timeLabel ?? 'Time', type: 'time' },
+    { key: 'date', label: 'Date', type: 'date', required: true },
+    { key: 'time', label: options?.timeLabel ?? 'Time', type: 'time' },
   ],
 });
 
@@ -87,10 +87,10 @@ export const barMitzvahBoySection: FormSection = {
   title: 'Bucher',
   fields: [
     {
-      key: 'boyName',
+      key: 'bucherName',
       label: "Name",
       type: 'text',
-      placeholder: 'e.g. Eliyahu Goldstein',
+      placeholder: 'e.g. Yitzchok Goldstein',
       required: true,
     },
   ],
@@ -107,13 +107,13 @@ export const fatherSection: FormSection = {
       required: true,
     },
     {
-      key: 'fatherSonOfRabbi',
+      key: 'fatherBenR',
       label: 'Ben R’',
       type: 'text',
       placeholder: 'e.g. Rabbi Yisroel Goldstein',
     },
     {
-      key: 'fatherSonInLawOfRabbi',
+      key: 'fatherChasanR',
       label: 'Chasan R’',
       type: 'text',
       placeholder: 'e.g. Rabbi Chaim Weiss',

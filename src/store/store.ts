@@ -1,4 +1,5 @@
 import { authApi } from '@/services/authApi';
+import { eventApi } from '@/services/eventApi';
 import { settingsApi } from '@/services/settingsApi';
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
@@ -8,12 +9,14 @@ export const store = configureStore({
   reducer: {
     auth : authReducer,
     [authApi.reducerPath]: authApi.reducer,
-     [settingsApi.reducerPath]: settingsApi.reducer,
+    [settingsApi.reducerPath]: settingsApi.reducer,
+    [eventApi.reducerPath]: eventApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       authApi.middleware,
-      settingsApi.middleware
+      settingsApi.middleware,
+      eventApi.middleware
     ),
 });
 

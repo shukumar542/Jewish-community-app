@@ -33,7 +33,7 @@ export default function DateField({ field, control }: Props) {
             } rounded-xl px-4 py-3`}
           >
             <Text style={tw`text-gray-900 ${!value ? 'text-gray-400' : ''}`}>
-              {value ? new Date(value).toLocaleDateString() : 'Select date'}
+              {value ? value : 'Select date'}
             </Text>
             <Ionicons name="calendar-outline" size={18} color="#9ca3af" />
           </TouchableOpacity>
@@ -47,7 +47,10 @@ export default function DateField({ field, control }: Props) {
               onValueChange={(event, selectedDate) => {
                 setShowPicker(false);
                 if (selectedDate) {
-                  onChange(selectedDate.toISOString());
+                  const y = selectedDate.getFullYear();
+                  const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                  const d = String(selectedDate.getDate()).padStart(2, '0');
+                  onChange(`${y}-${m}-${d}`);
                 }
               }}
               onDismiss={() => setShowPicker(false)}

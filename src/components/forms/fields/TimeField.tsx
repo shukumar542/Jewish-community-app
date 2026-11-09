@@ -14,6 +14,15 @@ interface Props {
 export default function TimeField({ field, control }: Props) {
   const [showPicker, setShowPicker] = useState(false);
 
+  const getTimeDate = (timeStr?: string) => {
+    const d = new Date();
+    if (timeStr && timeStr.includes(':')) {
+      const [h, m] = timeStr.split(':');
+      d.setHours(parseInt(h, 10), parseInt(m, 10), 0, 0);
+    }
+    return d;
+  };
+
   return (
     <Controller
       control={control}
@@ -34,9 +43,7 @@ export default function TimeField({ field, control }: Props) {
           >
             <Ionicons name="time-outline" size={18} color="#9ca3af" />
             <Text style={tw`ml-2 text-gray-900 ${!value ? 'text-gray-400' : ''}`}>
-              {value
-                ? new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                : 'Select time'}
+              {value ? value : 'Select time'}
             </Text>
           </TouchableOpacity>
 
@@ -44,12 +51,14 @@ export default function TimeField({ field, control }: Props) {
 
           {showPicker && (
             <DateTimePicker
-              value={value ? new Date(value) : new Date()}
+              value={getTimeDate(value)}
               mode="time"
               onValueChange={(event, selectedTime) => {
                 setShowPicker(false);
                 if (selectedTime) {
-                  onChange(selectedTime.toISOString());
+                  const h = String(selectedTime.getHours()).padStart(2, '0');
+                  const m = String(selectedTime.getMinutes()).padStart(2, '0');
+                  onChange(`${h}:${m}`);
                 }
               }}
               onDismiss={() => setShowPicker(false)}

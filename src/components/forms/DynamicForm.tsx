@@ -2,7 +2,7 @@ import { EventFormSchema } from '@/constants/form-schemas/types';
 import tw from '@/lib/tw';
 import { Ionicons } from '@expo/vector-icons';
 import { useForm } from 'react-hook-form';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import DateField from './fields/DateField';
 import ImageField from './fields/ImageField';
 import LocationField from './fields/LocationField';
@@ -12,10 +12,58 @@ import TimeField from './fields/TimeField';
 interface Props {
     schema: EventFormSchema;
     onSubmit: (data: any) => void;
+    isLoading?: boolean;
 }
 
-export default function DynamicForm({ schema, onSubmit }: Props) {
-    const { control, handleSubmit } = useForm();
+export default function DynamicForm({ schema, onSubmit, isLoading }: Props) {
+    const { control, handleSubmit, setValue } = useForm();
+
+    const handleFormSubmit = async (formData: any) => {
+        let lat = formData.lat;
+        let long = formData.long;
+
+        const addressKey = schema.sections
+            .flatMap((s) => s.fields)
+            .find((f) => f.type === 'location')?.key;
+
+        const addressValue = addressKey ? formData[addressKey] : formData.address;
+
+        if ((lat === undefined || long === undefined) && addressValue) {
+            try {
+                const res = await fetch(
+                    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+                        addressValue
+                    )}&format=json&limit=1`,
+                    {
+                        headers: {
+                            'User-Agent': 'CommunityCelebrationApp/1.0',
+                        },
+                    }
+                );
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    lat = parseFloat(data[0].lat);
+                    long = parseFloat(data[0].lon);
+                }
+            } catch (e) {
+                console.warn('Geocoding fallback error:', e);
+            }
+        }
+
+        const { eventTitle, ...restDetails } = formData;
+
+        const payload: Record<string, any> = {
+            category: schema.title,
+            ...(eventTitle ? { eventTitle } : (schema.title === 'Chasunah' ? { eventTitle: '' } : {})),
+            details: {
+                ...restDetails,
+                ...(lat !== undefined ? { lat } : {}),
+                ...(long !== undefined ? { long } : {}),
+            },
+        };
+
+        onSubmit(payload);
+    };
 
     return (
         <View style={tw`gap-6`}>
@@ -41,7 +89,14 @@ export default function DynamicForm({ schema, onSubmit }: Props) {
                             case 'image':
                                 return <ImageField key={field.key} field={field} control={control} />;
                             case 'location':
-                                return <LocationField key={field.key} field={field} control={control} />;
+                                return (
+                                    <LocationField
+                                        key={field.key}
+                                        field={field}
+                                        control={control}
+                                        setValue={setValue}
+                                    />
+                                );
                             case 'time':
                                 return <TimeField key={field.key} field={field} control={control} />;
                             default:
@@ -52,11 +107,20 @@ export default function DynamicForm({ schema, onSubmit }: Props) {
             ))}
 
             <TouchableOpacity
-                onPress={handleSubmit(onSubmit)}
-                style={tw`bg-primary py-3 rounded-full items-center  flex-row justify-center gap-2`}
+                onPress={handleSubmit(handleFormSubmit)}
+                disabled={isLoading}
+                style={tw`bg-primary py-3 rounded-full items-center flex-row justify-center gap-2 ${
+                    isLoading ? 'opacity-70' : ''
+                }`}
             >
-                <Text style={tw`text-white font-bold text-base`}>Review Submission</Text>
-                <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+                {isLoading ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                    <>
+                        <Text style={tw`text-white font-bold text-base`}>Review Submission</Text>
+                        <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+                    </>
+                )}
             </TouchableOpacity>
         </View>
     );

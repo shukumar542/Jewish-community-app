@@ -5,7 +5,6 @@ export const weddingSchema: EventFormSchema = {
     category: 'wedding',
     title: 'Chasunah',
     sections: [
-        // coverImageSection,
         groomSection,
         parentInLawSection(1),
         parentInLawSection(2),

@@ -20,7 +20,10 @@ function RootNavigator() {
   const colorScheme = useColorScheme();
   const dispatch = useAppDispatch();
   const isHydrated = useAppSelector((s) => s.auth.isHydrated);
-  const token = useAppSelector((s) => s.auth.token)
+  const token = useAppSelector((s) => s.auth.token);
+  const isGuest = useAppSelector((s) => s.auth.isGuest);
+
+  const isAllowedInApp = !!token || isGuest;
 
   useEffect(() => {
     async function prepare() {
@@ -53,14 +56,16 @@ function RootNavigator() {
             <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
             <Stack screenOptions={{ headerShown: false }}>
 
-              <Stack.Protected guard={!!token}>
+              <Stack.Protected guard={isAllowedInApp}>
                 <Stack.Screen name="(tabs)" />
                 <Stack.Screen name="(settings)" />
               </Stack.Protected>
 
+              <Stack.Protected guard={!token && !isGuest}>
+                <Stack.Screen name="index" />
+              </Stack.Protected>
 
               <Stack.Protected guard={!token}>
-                <Stack.Screen name="index" />
                 <Stack.Screen name="(auth)" />
               </Stack.Protected>
             </Stack>
