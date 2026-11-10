@@ -1,6 +1,6 @@
-# Event Creation API Documentation (Postman Style)
+# Event Creation & API Reference (Postman Style)
 
-Documentation for creating events via the backend API.
+Complete documentation for creating events and updating user profile with addresses & coordinatesss.
 
 ---
 
@@ -17,45 +17,29 @@ Documentation for creating events via the backend API.
 
 ---
 
-## 🔑 Common Rules & Behavior
+## 🔑 Common Rules & Validation Behavior
 
 1. **`eventTitle` (Optional):**
-   * If provided, the event will use this title.
-   * If omitted or empty, the backend **dynamically generates** the title based on the primary person (e.g., Groom's name, Bar Mitzvah boy, Mourner/Deceased name, or Father's name).
+   * If provided in the root body, that title is used.
+   * If omitted or empty, the backend **automatically generates** a meaningful title from the primary person (e.g., groom, boy, father, deceased, or mechitunim).
 2. **`details` (Strict Whitelist):**
-   * Only the fields declared for that specific category are allowed. Extra or misspelled fields will return `400 Bad Request`.
-3. **Event Status:**
-   * Newly submitted events automatically start with `"status": "pending"`.
-4. **Geo Coordinates:**
-   * Optional `lat` and `long` numbers can be included inside `details` for any event if available from map picker.
+   * Only the fields declared for that specific category are allowed. Extra or misspelled properties will immediately return `400 Bad Request`.
+3. **Geo-Coordinates (`lat`, `long`):**
+   * **Primary Venue:** `address`, `lat`, `long`
+   * **Bris Venue (for `Voch Nocht` & `Zucher Vach Nacht`):** `brisAddress`, `brisLat`, `brisLong`
+   * `lat` and `long` are optional numbers from map picker.
+4. **Special Category Nuances:**
+   * **Shidduch:** Engagement announcement only — **NO** address, lat, or long.
+   * **Sheva Brachos & Shabbos Sheva Brachos:** Focused on Mechitunim — **NO** chosonName, hallName, or time.
+   * **Zocher:** Friday night gathering — **NO** date or time.
+5. **Initial Status:**
+   * All newly submitted events start with `"status": "pending"`.
 
 ---
 
-## 📋 Standard Success Response (201 Created)
+## ❌ Error Responses
 
-```json
-{
-  "success": true,
-  "message": "Event created successfully",
-  "data": {
-    "_id": "672e1a2f9b1c2d001234abcd",
-    "category": "Chasunah",
-    "eventTitle": "David Cohen",
-    "status": "pending",
-    "createdBy": "672e18559b1c2d0012340001",
-    "details": { ... },
-    "createdAt": "2026-11-08T09:30:00.000Z",
-    "updatedAt": "2026-11-08T09:30:00.000Z",
-    "__v": 0
-  }
-}
-```
-
----
-
-## ❌ Common Error Responses
-
-### 400 Bad Request — Unknown or Invalid Fields
+### 400 Bad Request (Invalid / Unknown Field)
 ```json
 {
   "message": "property unknownField should not exist",
@@ -64,7 +48,7 @@ Documentation for creating events via the backend API.
 }
 ```
 
-### 401 Unauthorized — Missing / Expired Token
+### 401 Unauthorized (Missing / Expired Token)
 ```json
 {
   "message": "Token is required or invalid",
@@ -75,7 +59,7 @@ Documentation for creating events via the backend API.
 
 ---
 
-# 📦 Category-Wise Postman Examples
+# 📦 All 14 Category Postman Examples (Request & Response)
 
 ---
 
@@ -85,7 +69,6 @@ Documentation for creating events via the backend API.
 ```json
 {
   "category": "Chasunah",
-  "eventTitle": "",
   "details": {
     "chosonName": "David Cohen",
     "mechiten1Name": "Rabbi Boruch Lefkowitz",
@@ -96,10 +79,10 @@ Documentation for creating events via the backend API.
     "mechiten2ChasanR": "Rabbi Moshe Green",
     "hallName": "Ateres Chaim Hall",
     "address": "123 Main St, Brooklyn, NY",
-    "date": "2026-11-20",
-    "time": "18:30",
     "lat": 40.6782,
-    "long": -73.9442
+    "long": -73.9442,
+    "date": "2026-11-20",
+    "time": "18:30"
   }
 }
 ```
@@ -110,11 +93,11 @@ Documentation for creating events via the backend API.
   "success": true,
   "message": "Event created successfully",
   "data": {
-    "_id": "672e1a2f9b1c2d0012340002",
+    "_id": "672e1a2f9b1c2d0012340001",
     "category": "Chasunah",
     "eventTitle": "David Cohen",
     "status": "pending",
-    "createdBy": "672e18559b1c2d0012340001",
+    "createdBy": "672e18559b1c2d0012340000",
     "details": {
       "chosonName": "David Cohen",
       "mechiten1Name": "Rabbi Boruch Lefkowitz",
@@ -125,13 +108,13 @@ Documentation for creating events via the backend API.
       "mechiten2ChasanR": "Rabbi Moshe Green",
       "hallName": "Ateres Chaim Hall",
       "address": "123 Main St, Brooklyn, NY",
-      "date": "2026-11-20",
-      "time": "18:30",
       "lat": 40.6782,
-      "long": -73.9442
+      "long": -73.9442,
+      "date": "2026-11-20",
+      "time": "18:30"
     },
-    "createdAt": "2026-11-08T09:30:00.000Z",
-    "updatedAt": "2026-11-08T09:30:00.000Z",
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
     "__v": 0
   }
 }
@@ -152,10 +135,10 @@ Documentation for creating events via the backend API.
     "fatherChasanR": "Rabbi Chaim Weiss",
     "hallName": "Kiryas Joel Hall",
     "address": "45 Forest Rd, Monroe, NY",
-    "date": "2026-11-15",
-    "time": "19:00",
     "lat": 41.3255,
-    "long": -74.1865
+    "long": -74.1865,
+    "date": "2026-11-15",
+    "time": "19:00"
   }
 }
 ```
@@ -166,11 +149,11 @@ Documentation for creating events via the backend API.
   "success": true,
   "message": "Event created successfully",
   "data": {
-    "_id": "672e1a2f9b1c2d0012340003",
+    "_id": "672e1a2f9b1c2d0012340002",
     "category": "Bar Mitzvah",
     "eventTitle": "Yitzchok Goldstein",
     "status": "pending",
-    "createdBy": "672e18559b1c2d0012340001",
+    "createdBy": "672e18559b1c2d0012340000",
     "details": {
       "bucherName": "Yitzchok Goldstein",
       "fatherName": "Rabbi Menachem Goldstein",
@@ -178,13 +161,13 @@ Documentation for creating events via the backend API.
       "fatherChasanR": "Rabbi Chaim Weiss",
       "hallName": "Kiryas Joel Hall",
       "address": "45 Forest Rd, Monroe, NY",
-      "date": "2026-11-15",
-      "time": "19:00",
       "lat": 41.3255,
-      "long": -74.1865
+      "long": -74.1865,
+      "date": "2026-11-15",
+      "time": "19:00"
     },
-    "createdAt": "2026-11-08T09:30:00.000Z",
-    "updatedAt": "2026-11-08T09:30:00.000Z",
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
     "__v": 0
   }
 }
@@ -192,7 +175,7 @@ Documentation for creating events via the backend API.
 
 ---
 
-### 3. Shidduch
+### 3. Shidduch (Matchmaking Announcement — No Venue Address)
 
 **Request Body:**
 ```json
@@ -220,11 +203,11 @@ Documentation for creating events via the backend API.
   "success": true,
   "message": "Event created successfully",
   "data": {
-    "_id": "672e1a2f9b1c2d0012340004",
+    "_id": "672e1a2f9b1c2d0012340003",
     "category": "Shidduch",
     "eventTitle": "Yisroel Green & Sara Lefkowitz",
     "status": "pending",
-    "createdBy": "672e18559b1c2d0012340001",
+    "createdBy": "672e18559b1c2d0012340000",
     "details": {
       "chosonName": "Yisroel Green",
       "fatherName": "Rabbi Moshe Green",
@@ -238,8 +221,8 @@ Documentation for creating events via the backend API.
       "date": "2026-11-10",
       "time": "20:00"
     },
-    "createdAt": "2026-11-08T09:30:00.000Z",
-    "updatedAt": "2026-11-08T09:30:00.000Z",
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
     "__v": 0
   }
 }
@@ -260,6 +243,8 @@ Documentation for creating events via the backend API.
     "daughterOf": "Rabbi Chaim Friedman",
     "aveilim": "Sons: Moshe, Avrum. Daughters: Gitty, Chayala",
     "address": "45 Bedford Ave, Brooklyn, NY",
+    "lat": 40.7199,
+    "long": -73.9525,
     "sittingUntil": "2026-11-14"
   }
 }
@@ -271,11 +256,11 @@ Documentation for creating events via the backend API.
   "success": true,
   "message": "Event created successfully",
   "data": {
-    "_id": "672e1a2f9b1c2d0012340005",
+    "_id": "672e1a2f9b1c2d0012340004",
     "category": "Nichum Aveilim",
     "eventTitle": "Reb Yisroel ben Moshe",
     "status": "pending",
-    "createdBy": "672e18559b1c2d0012340001",
+    "createdBy": "672e18559b1c2d0012340000",
     "details": {
       "nifterName": "Reb Yisroel ben Moshe",
       "wifeOf": "Mrs. Greenfeld",
@@ -283,10 +268,12 @@ Documentation for creating events via the backend API.
       "daughterOf": "Rabbi Chaim Friedman",
       "aveilim": "Sons: Moshe, Avrum. Daughters: Gitty, Chayala",
       "address": "45 Bedford Ave, Brooklyn, NY",
+      "lat": 40.7199,
+      "long": -73.9525,
       "sittingUntil": "2026-11-14"
     },
-    "createdAt": "2026-11-08T09:30:00.000Z",
-    "updatedAt": "2026-11-08T09:30:00.000Z",
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
     "__v": 0
   }
 }
@@ -306,6 +293,8 @@ Documentation for creating events via the backend API.
     "fatherChasanR": "Rabbi Chaim Weiss",
     "address": "120 Hewes St, Brooklyn, NY",
     "locationDescription": "Father-in-law's house",
+    "lat": 40.7042,
+    "long": -73.9555,
     "zmanShachris": "09:30"
   }
 }
@@ -317,21 +306,23 @@ Documentation for creating events via the backend API.
   "success": true,
   "message": "Event created successfully",
   "data": {
-    "_id": "672e1a2f9b1c2d0012340006",
+    "_id": "672e1a2f9b1c2d0012340005",
     "category": "Kiddish",
     "eventTitle": "Rabbi Menachem Goldstein",
     "status": "pending",
-    "createdBy": "672e18559b1c2d0012340001",
+    "createdBy": "672e18559b1c2d0012340000",
     "details": {
       "fatherName": "Rabbi Menachem Goldstein",
       "fatherBenR": "Rabbi Yisroel Goldstein",
       "fatherChasanR": "Rabbi Chaim Weiss",
       "address": "120 Hewes St, Brooklyn, NY",
       "locationDescription": "Father-in-law's house",
+      "lat": 40.7042,
+      "long": -73.9555,
       "zmanShachris": "09:30"
     },
-    "createdAt": "2026-11-08T09:30:00.000Z",
-    "updatedAt": "2026-11-08T09:30:00.000Z",
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
     "__v": 0
   }
 }
@@ -339,7 +330,7 @@ Documentation for creating events via the backend API.
 
 ---
 
-### 6. Zucher Vach Nacht
+### 6. Zucher Vach Nacht (Dual Venue)
 
 **Request Body:**
 ```json
@@ -351,8 +342,12 @@ Documentation for creating events via the backend API.
     "fatherChasanR": "Rabbi Chaim Weiss",
     "address": "120 Hewes St, Brooklyn, NY",
     "locationDescription": "Father-in-law's house",
+    "lat": 40.7042,
+    "long": -73.9555,
     "brisAddress": "78 Rodney St, Brooklyn, NY",
     "brisLocationDescription": "Main Synagogue",
+    "brisLat": 40.7078,
+    "brisLong": -73.9589,
     "date": "2026-11-12",
     "time": "20:30"
   }
@@ -365,24 +360,28 @@ Documentation for creating events via the backend API.
   "success": true,
   "message": "Event created successfully",
   "data": {
-    "_id": "672e1a2f9b1c2d0012340007",
+    "_id": "672e1a2f9b1c2d0012340006",
     "category": "Zucher Vach Nacht",
     "eventTitle": "Rabbi Menachem Goldstein",
     "status": "pending",
-    "createdBy": "672e18559b1c2d0012340001",
+    "createdBy": "672e18559b1c2d0012340000",
     "details": {
       "fatherName": "Rabbi Menachem Goldstein",
       "fatherBenR": "Rabbi Yisroel Goldstein",
       "fatherChasanR": "Rabbi Chaim Weiss",
       "address": "120 Hewes St, Brooklyn, NY",
       "locationDescription": "Father-in-law's house",
+      "lat": 40.7042,
+      "long": -73.9555,
       "brisAddress": "78 Rodney St, Brooklyn, NY",
       "brisLocationDescription": "Main Synagogue",
+      "brisLat": 40.7078,
+      "brisLong": -73.9589,
       "date": "2026-11-12",
       "time": "20:30"
     },
-    "createdAt": "2026-11-08T09:30:00.000Z",
-    "updatedAt": "2026-11-08T09:30:00.000Z",
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
     "__v": 0
   }
 }
@@ -390,7 +389,68 @@ Documentation for creating events via the backend API.
 
 ---
 
-### 7. Bavarfen
+### 7. Voch Nocht (or Vach Nacht) (Dual Venue)
+
+**Request Body:**
+```json
+{
+  "category": "Vach Nacht",
+  "details": {
+    "fatherName": "Rabbi Menachem Goldstein",
+    "fatherBenR": "Rabbi Yisroel Goldstein",
+    "fatherChasanR": "Rabbi Chaim Weiss",
+    "address": "120 Hewes St, Brooklyn, NY",
+    "locationDescription": "Father-in-law's house",
+    "lat": 40.7042,
+    "long": -73.9555,
+    "date": "2026-11-12",
+    "time": "20:00",
+    "brisAddress": "78 Rodney St, Brooklyn, NY",
+    "brisLocationDescription": "Main Shul",
+    "brisLat": 40.7078,
+    "brisLong": -73.9589,
+    "zmanShachris": "08:30"
+  }
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Event created successfully",
+  "data": {
+    "_id": "672e1a2f9b1c2d0012340007",
+    "category": "Vach Nacht",
+    "eventTitle": "Rabbi Menachem Goldstein",
+    "status": "pending",
+    "createdBy": "672e18559b1c2d0012340000",
+    "details": {
+      "fatherName": "Rabbi Menachem Goldstein",
+      "fatherBenR": "Rabbi Yisroel Goldstein",
+      "fatherChasanR": "Rabbi Chaim Weiss",
+      "address": "120 Hewes St, Brooklyn, NY",
+      "locationDescription": "Father-in-law's house",
+      "lat": 40.7042,
+      "long": -73.9555,
+      "date": "2026-11-12",
+      "time": "20:00",
+      "brisAddress": "78 Rodney St, Brooklyn, NY",
+      "brisLocationDescription": "Main Shul",
+      "brisLat": 40.7078,
+      "brisLong": -73.9589,
+      "zmanShachris": "08:30"
+    },
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
+    "__v": 0
+  }
+}
+```
+
+---
+
+### 8. Bavarfen
 
 **Request Body:**
 ```json
@@ -402,6 +462,8 @@ Documentation for creating events via the backend API.
     "kallahsFather": "Rabbi Alter Schwartz",
     "address": "50 Rutledge St, Brooklyn, NY",
     "locationDescription": "Father-in-law's house",
+    "lat": 40.7011,
+    "long": -73.9542,
     "date": "2026-11-21",
     "zmanShachris": "09:15",
     "ladiesKiddush": "Schwartz residence, 12:00 PM"
@@ -419,19 +481,21 @@ Documentation for creating events via the backend API.
     "category": "Bavarfen",
     "eventTitle": "David Cohen",
     "status": "pending",
-    "createdBy": "672e18559b1c2d0012340001",
+    "createdBy": "672e18559b1c2d0012340000",
     "details": {
       "chosonName": "David Cohen",
       "chosonsFather": "Rabbi Boruch Lefkowitz",
       "kallahsFather": "Rabbi Alter Schwartz",
       "address": "50 Rutledge St, Brooklyn, NY",
       "locationDescription": "Father-in-law's house",
+      "lat": 40.7011,
+      "long": -73.9542,
       "date": "2026-11-21",
       "zmanShachris": "09:15",
       "ladiesKiddush": "Schwartz residence, 12:00 PM"
     },
-    "createdAt": "2026-11-08T09:30:00.000Z",
-    "updatedAt": "2026-11-08T09:30:00.000Z",
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
     "__v": 0
   }
 }
@@ -439,7 +503,7 @@ Documentation for creating events via the backend API.
 
 ---
 
-### 8. Bris
+### 9. Bris
 
 **Request Body:**
 ```json
@@ -451,31 +515,39 @@ Documentation for creating events via the backend API.
     "fatherChasanR": "Rabbi Chaim Weiss",
     "address": "78 Rodney St, Brooklyn, NY",
     "locationDescription": "Beis Medrash basement",
+    "lat": 40.7078,
+    "long": -73.9589,
     "date": "2026-11-13",
     "zmanShachris": "08:30"
   }
 }
 ```
 
----
-
-### 9. Voch Nocht (or Vach Nacht)
-
-**Request Body:**
+**Response (201 Created):**
 ```json
 {
-  "category": "Vach Nacht",
-  "details": {
-    "fatherName": "Rabbi Menachem Goldstein",
-    "fatherBenR": "Rabbi Yisroel Goldstein",
-    "fatherChasanR": "Rabbi Chaim Weiss",
-    "address": "120 Hewes St, Brooklyn, NY",
-    "locationDescription": "Father-in-law's house",
-    "date": "2026-11-12",
-    "time": "20:00",
-    "brisAddress": "78 Rodney St, Brooklyn, NY",
-    "brisLocationDescription": "Main Shul",
-    "zmanShachris": "08:30"
+  "success": true,
+  "message": "Event created successfully",
+  "data": {
+    "_id": "672e1a2f9b1c2d0012340009",
+    "category": "Bris",
+    "eventTitle": "Rabbi Menachem Goldstein",
+    "status": "pending",
+    "createdBy": "672e18559b1c2d0012340000",
+    "details": {
+      "fatherName": "Rabbi Menachem Goldstein",
+      "fatherBenR": "Rabbi Yisroel Goldstein",
+      "fatherChasanR": "Rabbi Chaim Weiss",
+      "address": "78 Rodney St, Brooklyn, NY",
+      "locationDescription": "Beis Medrash basement",
+      "lat": 40.7078,
+      "long": -73.9589,
+      "date": "2026-11-13",
+      "zmanShachris": "08:30"
+    },
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
+    "__v": 0
   }
 }
 ```
@@ -489,17 +561,40 @@ Documentation for creating events via the backend API.
 {
   "category": "Sheva Brachos",
   "details": {
-    "chosonName": "David Cohen",
     "mechiten1Name": "Rabbi Boruch Lefkowitz",
-    "mechiten1BenR": "Rabbi Yisroel Lefkowitz",
-    "mechiten1ChasanR": "Rabbi Chaim Weiss",
     "mechiten2Name": "Rabbi Alter Schwartz",
-    "mechiten2BenR": "Rabbi Shimon Schwartz",
-    "mechiten2ChasanR": "Rabbi Moshe Green",
-    "hallName": "Kiryas Joel Dining Room",
     "address": "14 Garfield Rd, Monroe, NY",
-    "date": "2026-11-22",
-    "time": "19:30"
+    "locationDescription": "Dining Room / Basement",
+    "lat": 41.3211,
+    "long": -74.1822,
+    "date": "2026-11-22"
+  }
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Event created successfully",
+  "data": {
+    "_id": "672e1a2f9b1c2d0012340010",
+    "category": "Sheva Brachos",
+    "eventTitle": "Rabbi Boruch Lefkowitz - Rabbi Alter Schwartz",
+    "status": "pending",
+    "createdBy": "672e18559b1c2d0012340000",
+    "details": {
+      "mechiten1Name": "Rabbi Boruch Lefkowitz",
+      "mechiten2Name": "Rabbi Alter Schwartz",
+      "address": "14 Garfield Rd, Monroe, NY",
+      "locationDescription": "Dining Room / Basement",
+      "lat": 41.3211,
+      "long": -74.1822,
+      "date": "2026-11-22"
+    },
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
+    "__v": 0
   }
 }
 ```
@@ -522,8 +617,43 @@ Documentation for creating events via the backend API.
     "mechiten2ChasanR": "Rabbi Moshe Green",
     "hallName": "Ateres Chaim",
     "address": "123 Main St, Brooklyn, NY",
+    "lat": 40.6782,
+    "long": -73.9442,
     "date": "2026-11-18",
     "time": "20:00"
+  }
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Event created successfully",
+  "data": {
+    "_id": "672e1a2f9b1c2d0012340011",
+    "category": "Tenoyim",
+    "eventTitle": "David Cohen",
+    "status": "pending",
+    "createdBy": "672e18559b1c2d0012340000",
+    "details": {
+      "chosonName": "David Cohen",
+      "mechiten1Name": "Rabbi Boruch Lefkowitz",
+      "mechiten1BenR": "Rabbi Yisroel Lefkowitz",
+      "mechiten1ChasanR": "Rabbi Chaim Weiss",
+      "mechiten2Name": "Rabbi Alter Schwartz",
+      "mechiten2BenR": "Rabbi Shimon Schwartz",
+      "mechiten2ChasanR": "Rabbi Moshe Green",
+      "hallName": "Ateres Chaim",
+      "address": "123 Main St, Brooklyn, NY",
+      "lat": 40.6782,
+      "long": -73.9442,
+      "date": "2026-11-18",
+      "time": "20:00"
+    },
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
+    "__v": 0
   }
 }
 ```
@@ -539,12 +669,38 @@ Documentation for creating events via the backend API.
   "details": {
     "mechiten1Name": "Rabbi Boruch Lefkowitz",
     "mechiten2Name": "Rabbi Alter Schwartz",
-    "chosonName": "David Cohen",
-    "hallName": "Main Bais Medrash",
     "address": "550 Bedford Ave, Brooklyn, NY",
     "locationDescription": "Simcha Hall B",
-    "date": "2026-11-21",
-    "time": "12:00"
+    "lat": 40.7099,
+    "long": -73.9567,
+    "date": "2026-11-21"
+  }
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Event created successfully",
+  "data": {
+    "_id": "672e1a2f9b1c2d0012340012",
+    "category": "Shabbos Sheva Brachos",
+    "eventTitle": "Rabbi Boruch Lefkowitz - Rabbi Alter Schwartz",
+    "status": "pending",
+    "createdBy": "672e18559b1c2d0012340000",
+    "details": {
+      "mechiten1Name": "Rabbi Boruch Lefkowitz",
+      "mechiten2Name": "Rabbi Alter Schwartz",
+      "address": "550 Bedford Ave, Brooklyn, NY",
+      "locationDescription": "Simcha Hall B",
+      "lat": 40.7099,
+      "long": -73.9567,
+      "date": "2026-11-21"
+    },
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
+    "__v": 0
   }
 }
 ```
@@ -563,15 +719,46 @@ Documentation for creating events via the backend API.
     "fatherChasanR": "Rabbi Chaim Weiss",
     "address": "10 Heyward St, Brooklyn, NY",
     "locationDescription": "Private Residence",
+    "lat": 40.7018,
+    "long": -73.9575,
     "date": "2026-11-25",
     "zmanShachris": "09:00"
   }
 }
 ```
 
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Event created successfully",
+  "data": {
+    "_id": "672e1a2f9b1c2d0012340013",
+    "category": "Pidyon Haben",
+    "eventTitle": "Rabbi Menachem Goldstein",
+    "status": "pending",
+    "createdBy": "672e18559b1c2d0012340000",
+    "details": {
+      "fatherName": "Rabbi Menachem Goldstein",
+      "fatherBenR": "Rabbi Yisroel Goldstein",
+      "fatherChasanR": "Rabbi Chaim Weiss",
+      "address": "10 Heyward St, Brooklyn, NY",
+      "locationDescription": "Private Residence",
+      "lat": 40.7018,
+      "long": -73.9575,
+      "date": "2026-11-25",
+      "zmanShachris": "09:00"
+    },
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
+    "__v": 0
+  }
+}
+```
+
 ---
 
-### 14. Zocher
+### 14. Zocher (Friday Night — No Date & Time)
 
 **Request Body:**
 ```json
@@ -583,8 +770,75 @@ Documentation for creating events via the backend API.
     "fatherChasanR": "Rabbi Chaim Weiss",
     "address": "120 Hewes St, Brooklyn, NY",
     "locationDescription": "Home of the grandparents",
-    "date": "2026-11-13",
-    "time": "21:00"
+    "lat": 40.7042,
+    "long": -73.9555
   }
 }
 ```
+
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Event created successfully",
+  "data": {
+    "_id": "672e1a2f9b1c2d0012340014",
+    "category": "Zocher",
+    "eventTitle": "Rabbi Menachem Goldstein",
+    "status": "pending",
+    "createdBy": "672e18559b1c2d0012340000",
+    "details": {
+      "fatherName": "Rabbi Menachem Goldstein",
+      "fatherBenR": "Rabbi Yisroel Goldstein",
+      "fatherChasanR": "Rabbi Chaim Weiss",
+      "address": "120 Hewes St, Brooklyn, NY",
+      "locationDescription": "Home of the grandparents",
+      "lat": 40.7042,
+      "long": -73.9555
+    },
+    "createdAt": "2026-11-09T06:40:00.000Z",
+    "updatedAt": "2026-11-09T06:40:00.000Z",
+    "__v": 0
+  }
+}
+```
+
+---
+
+# 👤 User Profile Update with Address & Coordinates
+
+* **Method:** `PATCH`
+* **URL:** `{{BASE_URL}}/user/profile`
+* **Authentication:** `Bearer Token` (Required)
+* **Headers:**
+  ```http
+  Authorization: Bearer {{ACCESS_TOKEN}}
+  Content-Type: application/json
+  ```
+
+**Request Body:**
+```json
+{
+  "fullName": "Mendel Green",
+  "phoneNumber": "+17185551234",
+  "address": "120 Hewes St, Brooklyn, NY",
+  "lat": 40.7042,
+  "long": -73.9555
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Profile updated successfully",
+  "data": {
+    "picture": "https://res.cloudinary.com/...",
+    "fullName": "Mendel Green",
+    "phoneNumber": "+17185551234",
+    "address": "120 Hewes St, Brooklyn, NY",
+    "lat": 40.7042,
+    "long": -73.9555
+  }
+}
+

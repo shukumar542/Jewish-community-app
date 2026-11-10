@@ -21,18 +21,18 @@ export interface EventCategory {
 }
 
 export const eventCategories: EventCategory[] = [
-  { key: 'wedding', label: 'Chasunah', icon: Chasunah },
-  { key: 'seven-blessings', label: 'Sheva Broches', icon: ShevaBerachos },
+  { key: 'chasunah', label: 'Chasunah', icon: Chasunah },
+  { key: 'shevaBroches', label: 'Sheva Brachos', icon: ShevaBerachos },
   { key: 'tenoyim', label: 'Tenoyim', icon: Tenoyim },
   { key: 'bar-mitzvah', label: 'Bar Mitzvah', icon: BarMitzvah },
-  { key: 'night-before-bris', label: 'Vach Nacht', icon: Vochnocht },
+  { key: 'vachNacht', label: 'Vach Nacht', icon: Vochnocht },
   { key: 'bris', label: 'Bris', icon: Bris },
-  { key: 'bris-redemption', label: 'Bris / Pidyon Haben', icon: PidyonHaben },
-  { key: 'matchmaking', label: 'Shidduch', icon: Shidduch },
-  { key: 'comforting-mourners', label: 'Nichum Aveilim', icon: NichumAveilim },
+  { key: 'pidyonHaben', label: 'Pidyon Haben', icon: PidyonHaben },
+  { key: 'shidduch', label: 'Shidduch', icon: Shidduch },
+  { key: 'nichumAveilim', label: 'Nichum Aveilim', icon: NichumAveilim },
   { key: 'shalom-zachar', label: 'Shulem Zucher', icon: Zucher },
-  { key: 'kiddush', label: ' Kiddish', icon: Kiddish },
-  { key: 'shalom-zachar-bris',label: 'Zucher Vach Nacht ',icon: ZucherVochnocht},
-  { key: 'aufruf', label: 'Bavarfen', icon: BavarfenShtreimel },
-  { key: 'sabbath-seven-blessings', label: 'Shabbos Sheva Broches', icon: ShabbosShevaBerachos,},
+  { key: 'kiddush', label: 'Kiddish', icon: Kiddish },
+  { key: 'zucherVachNacht', label: 'Zucher Vach Nacht', icon: ZucherVochnocht },
+  { key: 'bavarfen', label: 'Bavarfen', icon: BavarfenShtreimel },
+  { key: 'shabbosShevaBroches', label: 'Shabbos Sheva Broches', icon: ShabbosShevaBerachos },
 ];

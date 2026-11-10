@@ -123,34 +123,44 @@ export const fatherSection: FormSection = {
 
 export const locationDetailsSection = (options?: {
   includeDateTime?: boolean;
-  includeTime ? : boolean;
+  includeTime?: boolean;
   timeLabel?: string;
+  timeKey?: string;
   title?: string;
+  addressKey?: string;
+  addressLabel?: string;
+  locationDescriptionKey?: string;
+  dateKey?: string;
+  locationDescriptionPlaceholder?: string;
+  latKey?: string;
+  longKey?: string;
 }): FormSection => ({
   title: options?.title ?? 'Venue',
   fields: [
     {
-      key: 'gatheringAddress',
-      label: 'Address',
+      key: options?.addressKey ?? 'address',
+      label: options?.addressLabel ?? 'Address',
       type: 'location',
       placeholder: 'Full address',
       required: true,
+      latKey: options?.latKey,
+      longKey: options?.longKey,
     },
     {
-      key: 'whoseHouse',
+      key: options?.locationDescriptionKey ?? 'locationDescription',
       label: 'Location Description',
       type: 'text',
-      placeholder: 'e.g. Father-in-law’s house',
+      placeholder: options?.locationDescriptionPlaceholder ?? 'e.g. Father-in-law’s house',
     },
     ...(options?.includeDateTime
       ? [
-          { key: 'eventDate', label: 'Date', type: 'date' as const, required: true },
-          { key: 'eventTime', label: options?.timeLabel ?? 'Time', type: 'time' as const },
+          { key: options?.dateKey ?? 'date', label: 'Date', type: 'date' as const, required: true },
+          { key: options?.timeKey ?? 'time', label: options?.timeLabel ?? 'Time', type: 'time' as const },
         ]
       : []),
     ...(options?.includeTime
       ? [
-          { key: 'eventTime', label: options?.timeLabel ?? 'Time', type: 'time' as const },
+          { key: options?.timeKey ?? 'time', label: options?.timeLabel ?? 'Time', type: 'time' as const },
         ]
       : []),
   ],
@@ -341,7 +351,7 @@ export const locationScheduleSection: FormSection = {
       placeholder: "e.g. Father-in-law’s house",
     },
     { key: 'date', label: 'Date', type: 'date', required: true },
-    { key: 'eventDate', label: 'Zman Shachris', type: 'date', required: true },
+    { key: 'eventDate', label: 'Zman Shachris', type: 'time', required: true },
     {
       key: 'ladiesKiddush',
       label: "Ladies' Kiddush (optional)",

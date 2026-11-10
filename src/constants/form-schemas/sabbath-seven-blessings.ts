@@ -1,13 +1,35 @@
-import { locationDateSection, parentInLawSection } from './shared-sections';
+import { parentInLawSection } from './shared-sections';
 import { EventFormSchema } from './types';
 
 export const sabbathSevenBlessingsSchema: EventFormSchema = {
-  category: 'sabbath-seven-blessings',
-  title: 'Shabbos Sheva Broches',
+  category: 'shabbosShevaBroches',
+  title: 'Shabbos Sheva Brachos',
   sections: [
-    // coverImageSection,
     parentInLawSection(1, { simple: true }),
     parentInLawSection(2, { simple: true }),
-    locationDateSection,
+    {
+      title: 'Venue',
+      fields: [
+        {
+          key: 'address',
+          label: 'Address',
+          type: 'location',
+          placeholder: 'Full address',
+          required: true,
+        },
+        {
+          key: 'locationDescription',
+          label: 'Location Description',
+          type: 'text',
+          placeholder: 'e.g. Dining Room / Basement',
+        },
+        {
+          key: 'date',
+          label: 'Date',
+          type: 'date',
+          required: true,
+        },
+      ],
+    },
   ],
 };

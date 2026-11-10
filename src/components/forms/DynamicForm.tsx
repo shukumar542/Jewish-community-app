@@ -22,17 +22,11 @@ export default function DynamicForm({ schema, onSubmit, isLoading }: Props) {
         let lat = formData.lat;
         let long = formData.long;
 
-        const addressKey = schema.sections
-            .flatMap((s) => s.fields)
-            .find((f) => f.type === 'location')?.key;
-
-        const addressValue = addressKey ? formData[addressKey] : formData.address;
-
-        if ((lat === undefined || long === undefined) && addressValue) {
+        if ((lat === undefined || long === undefined) && formData.address) {
             try {
                 const res = await fetch(
                     `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-                        addressValue
+                        formData.address
                     )}&format=json&limit=1`,
                     {
                         headers: {
@@ -50,6 +44,31 @@ export default function DynamicForm({ schema, onSubmit, isLoading }: Props) {
             }
         }
 
+        let brisLat = formData.brisLat;
+        let brisLong = formData.brisLong;
+
+        if ((brisLat === undefined || brisLong === undefined) && formData.brisAddress) {
+            try {
+                const res = await fetch(
+                    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+                        formData.brisAddress
+                    )}&format=json&limit=1`,
+                    {
+                        headers: {
+                            'User-Agent': 'CommunityCelebrationApp/1.0',
+                        },
+                    }
+                );
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    brisLat = parseFloat(data[0].lat);
+                    brisLong = parseFloat(data[0].lon);
+                }
+            } catch (e) {
+                console.warn('Geocoding fallback error for brisAddress:', e);
+            }
+        }
+
         const { eventTitle, ...restDetails } = formData;
 
         const payload: Record<string, any> = {
@@ -59,6 +78,8 @@ export default function DynamicForm({ schema, onSubmit, isLoading }: Props) {
                 ...restDetails,
                 ...(lat !== undefined ? { lat } : {}),
                 ...(long !== undefined ? { long } : {}),
+                ...(brisLat !== undefined ? { brisLat } : {}),
+                ...(brisLong !== undefined ? { brisLong } : {}),
             },
         };
 

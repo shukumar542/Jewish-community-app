@@ -85,9 +85,11 @@ export default function LocationField({ field, control, setValue }: Props) {
     setSuggestions([]);
 
     if (setValue) {
+      const latKey = field.latKey || (field.key.startsWith('bris') ? 'brisLat' : 'lat');
+      const longKey = field.longKey || (field.key.startsWith('bris') ? 'brisLong' : 'long');
       setValue(field.key, address, { shouldValidate: true });
-      setValue('lat', lat, { shouldValidate: true });
-      setValue('long', lon, { shouldValidate: true });
+      setValue(latKey, lat, { shouldValidate: true });
+      setValue(longKey, lon, { shouldValidate: true });
     }
   };
 

@@ -1,17 +1,30 @@
 import {
   fatherSection,
-  locationDetailsSection
+  locationDetailsSection,
 } from './shared-sections';
 import { EventFormSchema } from './types';
 
 export const shalomZacharBrisSchema: EventFormSchema = {
-  category: 'shalom-zachar-bris',
-  title: 'Zucher Vach Nacht ',
+  category: 'zucherVachNacht',
+  title: 'Zucher Vach Nacht',
   sections: [
-    // coverImageSection,
     fatherSection,
-    locationDetailsSection({title : "Zucher Venue"}),
-    locationDetailsSection({title : "Bris Venue" , includeDateTime : true}),
-    // dateTimeSection({ title: 'Date & Time', timeLabel: 'Morning Prayer Time' }),
+    locationDetailsSection({
+      title: 'Zucher Venue',
+      addressKey: 'address',
+      locationDescriptionKey: 'locationDescription',
+      latKey: 'lat',
+      longKey: 'long',
+    }),
+    locationDetailsSection({
+      title: 'Bris Venue',
+      includeDateTime: true,
+      addressKey: 'brisAddress',
+      locationDescriptionKey: 'brisLocationDescription',
+      latKey: 'brisLat',
+      longKey: 'brisLong',
+      dateKey: 'date',
+      timeKey: 'time',
+    }),
   ],
 };

@@ -2,7 +2,7 @@ import { groomSection, parentInLawSection, venueDateSection } from './shared-sec
 import { EventFormSchema } from './types';
 
 export const weddingSchema: EventFormSchema = {
-    category: 'wedding',
+    category: 'chasunah',
     title: 'Chasunah',
     sections: [
         groomSection,

@@ -8,6 +8,8 @@ export interface FormField {
   placeholder?: string;
   required?: boolean;
   options?: string[];
+  latKey?: string;
+  longKey?: string;
 }
 
 export interface FormSection {

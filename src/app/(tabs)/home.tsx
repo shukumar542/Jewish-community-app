@@ -1,71 +1,69 @@
 import EventCard from '@/components/ui/EventCard';
-import { useDebouncedRouter } from '@/hooks/useDebouncedRouter';
+import { eventCategories } from '@/constants/event-categories';
 import tw from '@/lib/tw';
+import { DateRange, useGetEventsQuery } from '@/services/eventApi';
 import { useAppSelector } from '@/store/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const timeFilters = ['Today', 'Tomorrow', 'This Week', 'All'];
-const categoryFilters = ['All', 'Wedding', 'Seven Blessings', 'Engagement', 'Gift Giving'];
-
-const events = [
-  {
-    id: '1',
-    title: 'Bars Mitzvah of Elijah Goldstein',
-    date: 'August 3, 2025',
-    location: 'Temple Beth Shalom, Brooklyn',
-    category: 'Wedding',
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552',
-    favorited: false,
-  },
-  {
-    id: '2',
-    title: 'Rosh Hashanah Community Dinner',
-    date: 'October 2, 2025',
-    location: 'Jewish Community Center, Bronx',
-    category: 'Seven Blessings',
-    image: 'https://images.unsplash.com/photo-1529636798458-92182e662485',
-    favorited: true,
-  },
-  {
-    id: '3',
-    title: 'Bar Mitzvah of Elijah Goldstein',
-    date: 'August 3, 2025',
-    location: 'Temple Beth Shalom, Brooklyn',
-    category: 'Wedding',
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552',
-    favorited: false,
-  },
+const timeFilterOptions: { label: string; value: DateRange }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Today', value: 'today' },
+  { label: 'Tomorrow', value: 'tomorrow' },
+  { label: 'This Week', value: 'this_week' },
 ];
 
-export default function Home() {
-  const { push } = useDebouncedRouter();
+const categoryFilters = ['All', ...eventCategories.map((c) => c.label.trim())];
 
+export default function Home() {
   const auth = useAppSelector((s) => s?.auth?.user);
 
-  console.log("auth", auth)
-
-  const [activeTimeFilter, setActiveTimeFilter] = useState('Today');
+  const [activeTimeFilter, setActiveTimeFilter] = useState<DateRange>('all');
   const [activeCategory, setActiveCategory] = useState('All');
+
+  const { data, isLoading, isFetching, isError, refetch } = useGetEventsQuery({
+    dateRange: activeTimeFilter,
+    category: activeCategory !== 'All' ? activeCategory : undefined,
+  });
+
+  const events = data?.data ?? [];
 
   return (
     <SafeAreaView style={tw`flex-1 bg-white`} edges={['top']}>
       <StatusBar style="dark" />
-      <ScrollView style={tw`flex-1`} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={tw`flex-1`}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isFetching && !isLoading}
+            onRefresh={refetch}
+            colors={['#f59e0b']}
+            tintColor="#f59e0b"
+          />
+        }
+      >
         {/* Header */}
         <View style={tw`flex-row items-center justify-between px-5 pt-4 pb-2`}>
           <View>
-            {/* <Text style={tw`text-gray-500 text-base`}>{auth?.fullName ?? 'Guest'}! 👋</Text> */}
-            <Text style={tw`text-2xl font-bold text-gray-900 mt-1`}>
+        
+            <Text style={tw`text-2xl font-bold text-gray-900 mt-0.5`}>
               Discover
             </Text>
           </View>
           <TouchableOpacity
-            onPress={() => router.push("/(tabs)/search")}
+            onPress={() => router.push('/(tabs)/search')}
             style={tw`w-11 h-11 rounded-xl border border-gray-300 items-center justify-center`}
           >
             <Ionicons name="search" size={20} color="#000000" />
@@ -76,24 +74,29 @@ export default function Home() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={tw`gap-3 px-3 `}
+          contentContainerStyle={tw`gap-2.5 px-5 mt-2`}
         >
-          {timeFilters.map((filter) => (
-            <TouchableOpacity
-              key={filter}
-              onPress={() => setActiveTimeFilter(filter)}
-              style={tw` py-2 px-5 flex-row rounded-full  ${activeTimeFilter === filter ? 'bg-amber-500' : 'bg-gray-100'
+          {timeFilterOptions.map((filter) => {
+            const isActive = activeTimeFilter === filter.value;
+            return (
+              <TouchableOpacity
+                key={filter.value}
+                onPress={() => setActiveTimeFilter(filter.value)}
+                style={tw`py-2 px-5 rounded-full ${
+                  isActive ? 'bg-amber-500' : 'bg-gray-100'
                 }`}
-            >
-              <Text
-              numberOfLines={1}
-                style={tw`text-sm font-semibold ${activeTimeFilter === filter ? 'text-white' : 'text-gray-600'
-                  }`}
               >
-                {filter}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  numberOfLines={1}
+                  style={tw`text-sm font-semibold ${
+                    isActive ? 'text-white' : 'text-gray-600'
+                  }`}
+                >
+                  {filter.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
         {/* Category Filters */}
@@ -101,32 +104,72 @@ export default function Home() {
           horizontal
           showsHorizontalScrollIndicator={false}
           style={tw`mt-3`}
-          contentContainerStyle={tw`gap-2 px-3`}
+          contentContainerStyle={tw`gap-2 px-5`}
         >
-          {categoryFilters.map((filter) => (
-            <TouchableOpacity
-              key={filter}
-              onPress={() => setActiveCategory(filter)}
-              style={tw`px-4 py-2 rounded-full border ${activeCategory === filter
-                ? 'bg-gray-900 border-gray-900'
-                : 'bg-white border-gray-300'
+          {categoryFilters.map((category) => {
+            const isActive = activeCategory === category;
+            return (
+              <TouchableOpacity
+                key={category}
+                onPress={() => setActiveCategory(category)}
+                style={tw`px-4 py-2 rounded-full border ${
+                  isActive
+                    ? 'bg-gray-900 border-gray-900'
+                    : 'bg-white border-gray-300'
                 }`}
-            >
-              <Text
-                style={tw`text-sm font-semibold ${activeCategory === filter ? 'text-white' : 'text-gray-600'
-                  }`}
               >
-                {filter}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={tw`text-sm font-semibold ${
+                    isActive ? 'text-white' : 'text-gray-600'
+                  }`}
+                >
+                  {category}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
-        {/* Event Cards */}
-        <View style={tw`px-5 mt-5 gap-4 pb-4`}>
-          {events.map((event) => (
-            <EventCard event={event} key={event.id} />
-          ))}
+        {/* Event Cards Listing */}
+        <View style={tw`px-5 mt-5 gap-4 pb-6`}>
+          {isLoading ? (
+            <View style={tw`py-16 items-center justify-center`}>
+              <ActivityIndicator size="large" color="#f59e0b" />
+              <Text style={tw`text-gray-400 text-sm mt-3`}>
+                Loading events...
+              </Text>
+            </View>
+          ) : isError ? (
+            <View style={tw`py-12 items-center justify-center px-4`}>
+              <Ionicons name="alert-circle-outline" size={44} color="#ef4444" />
+              <Text style={tw`text-gray-800 font-semibold text-base mt-2`}>
+                Failed to load events
+              </Text>
+              <Text style={tw`text-gray-400 text-xs text-center mt-1 mb-4`}>
+                Please check your network connection and try again.
+              </Text>
+              <TouchableOpacity
+                onPress={() => refetch()}
+                style={tw`bg-amber-500 px-5 py-2.5 rounded-full`}
+              >
+                <Text style={tw`text-white font-semibold text-sm`}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          ) : events.length === 0 ? (
+            <View style={tw`py-16 items-center justify-center px-4`}>
+              <Ionicons name="calendar-outline" size={44} color="#9ca3af" />
+              <Text style={tw`text-gray-800 font-semibold text-base mt-2`}>
+                No events found
+              </Text>
+              <Text style={tw`text-gray-400 text-xs text-center mt-1`}>
+                No events found for the selected date range and category.
+              </Text>
+            </View>
+          ) : (
+            events.map((event, index) => (
+              <EventCard key={event._id ?? index} event={event} />
+            ))
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

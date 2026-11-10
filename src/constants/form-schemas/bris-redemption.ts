@@ -1,15 +1,22 @@
 import {
   fatherSection,
-  locationDetailsSection
+  locationDetailsSection,
 } from './shared-sections';
 import { EventFormSchema } from './types';
 
+export { brisSchema } from './bris';
+
 export const brisRedemptionSchema: EventFormSchema = {
-  category: 'bris-redemption',
-  title: 'Bris',
+  category: 'pidyonHaben',
+  title: 'Pidyon Haben',
   sections: [
     fatherSection,
-    locationDetailsSection({ includeDateTime: true, title: 'Venue' , timeLabel : "Zman Shachris"}),
-    // dateTimeSection({ title: 'Venue & Date' }),
+    locationDetailsSection({
+      title: 'Venue',
+      includeDateTime: true,
+      timeKey: 'zmanShachris',
+      timeLabel: 'Zman Shachris',
+      locationDescriptionPlaceholder: 'e.g. Private Residence',
+    }),
   ],
 };
