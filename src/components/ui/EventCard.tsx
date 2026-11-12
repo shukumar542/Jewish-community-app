@@ -40,6 +40,7 @@ export default function EventCard({ event }: { event: any }) {
 
         const nextFav = !isFav;
         setIsFav(nextFav);
+        
 
         try {
             const res = await toggleFavourite({

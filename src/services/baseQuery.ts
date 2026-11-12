@@ -2,7 +2,7 @@ import { AuthState } from '@/store/authSlice';
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? 'http://10.10.28.71:8000';
+  process.env.EXPO_PUBLIC_API_URL ?? 'https://api.yishoma.com';
 
 export const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,

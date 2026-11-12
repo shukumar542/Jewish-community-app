@@ -1,6 +1,7 @@
 import Button from '@/components/ui/Button';
 import InputField from '@/components/ui/InputField';
 import tw from '@/lib/tw';
+import { useForgotPasswordMutation } from '@/services/authApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Mail } from 'lucide-react-native';
@@ -8,11 +9,12 @@ import { useState } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { toast } from 'sonner-native';
 
 export default function ForgetPassword() {
-  const [email, setEmail] = useState('sh@gmail.com');
+  const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const validate = () => {
     if (!email.trim()) {
@@ -29,18 +31,28 @@ export default function ForgetPassword() {
   const handleSendCode = async () => {
     if (!validate()) return;
 
-    setLoading(true);
     try {
-      // API call
+      const res = await forgotPassword({ email: email.trim().toLowerCase() }).unwrap();
+      toast.success(res?.message || 'Verification code sent to your email');
+
+      const tokenValue =
+        res?.data?.token ||
+        (typeof res?.data === 'string' ? res?.data : null) ||
+        res?.token;
 
       router.push({
         pathname: '/(auth)/OtpVerification',
-        params: { email, purpose: 'forgot-password' },
+        params: {
+          email: email.trim().toLowerCase(),
+          purpose: 'forgot-password',
+          token: tokenValue || '',
+        },
       });
-    } catch (e) {
-      console.warn(e);
-    } finally {
-      setLoading(false);
+    } catch (e: any) {
+      const errMsg =
+        e?.data?.message || e?.message || 'Failed to send verification code';
+      setEmailError(errMsg);
+      toast.error(errMsg);
     }
   };
 
@@ -79,9 +91,9 @@ export default function ForgetPassword() {
         ) : null}
 
         <Button
-          text={loading ? 'Sending...' : 'Send Verification Code'}
+          text={isLoading ? 'Sending...' : 'Send Verification Code'}
           onPress={handleSendCode}
-          loading={loading}
+          loading={isLoading}
           style={tw`mt-10`}
         />
       </KeyboardAwareScrollView>

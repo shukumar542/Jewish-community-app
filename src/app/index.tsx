@@ -60,11 +60,32 @@ export default function Index() {
             </TouchableOpacity>
 
             {/* Terms & Privacy */}
-            <Text style={tw`text-center text-gray-400 text-xs px-4 pt-1`}>
-              By continuing you agree to our{' '}
-              <Text style={tw`text-amber-500`}>Terms of Service</Text> and{'\n'}
-              <Text style={tw`text-amber-500`}>Privacy Policy</Text>
-            </Text>
+            <View style={tw`items-center pt-1`}>
+              <View style={tw`flex-row flex-wrap justify-center items-center`}>
+                <Text style={tw`text-gray-400 text-xs`}>
+                  By continuing you agree to our{' '}
+                </Text>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+                  onPress={() => router.push('/(settings)/termsCondition' as any)}
+                >
+                  <Text style={tw`text-amber-500 font-medium text-xs`}>
+                    Terms of Service
+                  </Text>
+                </TouchableOpacity>
+                <Text style={tw`text-gray-400 text-xs`}> and </Text>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+                  onPress={() => router.push('/(settings)/privacyPolicy' as any)}
+                >
+                  <Text style={tw`text-amber-500 font-medium text-xs`}>
+                    Privacy Policy
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </View>
       </SafeAreaView>

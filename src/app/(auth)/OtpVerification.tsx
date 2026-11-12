@@ -2,26 +2,50 @@ import Button from '@/components/ui/Button';
 import OTPInput, { OTPInputHandle } from '@/components/ui/OtpInput';
 import { saveSession } from '@/lib/authStorage';
 import tw from '@/lib/tw';
-import { useResendOtpMutation, useVerifyOtpMutation } from '@/services/authApi';
+import {
+  useResendForgotPasswordOtpMutation,
+  useResendOtpMutation,
+  useVerifyForgotPasswordOtpMutation,
+  useVerifyOtpMutation,
+} from '@/services/authApi';
 import { setCredentials } from '@/store/authSlice';
 import { useAppDispatch } from '@/store/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { toast } from 'sonner-native';
 
 export default function OtpVerification() {
-  const { email, purpose } = useLocalSearchParams<{ email: string; purpose: string }>();
+  const { email, purpose, token: initialToken } = useLocalSearchParams<{
+    email: string;
+    purpose?: string;
+    token?: string;
+  }>();
+
   const otpRef = useRef<OTPInputHandle>(null);
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [resending, setResending] = useState(false);
+  const [currentToken, setCurrentToken] = useState(initialToken || '');
   const dispatch = useAppDispatch();
 
-  const [verifyOtp, { isLoading }] = useVerifyOtpMutation();
-  const [resendOtp] = useResendOtpMutation();
+  const [verifyOtp, { isLoading: isVerifyingStandard }] = useVerifyOtpMutation();
+  const [verifyForgotPasswordOtp, { isLoading: isVerifyingForgot }] =
+    useVerifyForgotPasswordOtpMutation();
+
+  const [resendOtp, { isLoading: isResendingStandard }] = useResendOtpMutation();
+  const [resendForgotPasswordOtp, { isLoading: isResendingForgot }] =
+    useResendForgotPasswordOtpMutation();
+
+  const isVerifying = isVerifyingStandard || isVerifyingForgot;
+  const isResending = isResendingStandard || isResendingForgot;
+
+  useEffect(() => {
+    if (initialToken) {
+      setCurrentToken(initialToken);
+    }
+  }, [initialToken]);
 
   const handleVerify = async () => {
     if (otp.length !== 6) {
@@ -29,41 +53,74 @@ export default function OtpVerification() {
       return;
     }
     setError('');
-    setLoading(true);
-    try {
 
-      const res = await verifyOtp({ email, otp }).unwrap();
-      const { accessToken, user } = res.data;
-      await saveSession(accessToken, user);
-      dispatch(setCredentials({ token: accessToken, user }));
-      console.log('OTP verified:', res);
+    try {
       if (purpose === 'forgot-password') {
+        const res = await verifyForgotPasswordOtp({
+          token: currentToken,
+          otp: otp.trim(),
+        }).unwrap();
+
+        toast.success(res?.message || 'OTP verified successfully');
+
+        const resetPasswordToken =
+          res?.data?.resetPasswordToken ||
+          res?.resetPasswordToken ||
+          (typeof res?.data === 'string' ? res?.data : null) ||
+          res?.data?.token ||
+          res?.token ||
+          '';
+
         router.replace({
           pathname: '/(auth)/resetNewPassword',
-          params: { email },
+          params: {
+            email,
+            resetPasswordToken,
+          },
         });
       } else {
-        router.replace('/(auth)/login');
+        const res = await verifyOtp({ email, otp: otp.trim() }).unwrap();
+        const { accessToken, user } = res.data;
+        await saveSession(accessToken, user);
+        dispatch(setCredentials({ token: accessToken, user }));
+        toast.success(res?.message || 'OTP verified successfully');
+        router.replace('/(tabs)/home');
       }
     } catch (e: any) {
-      console.log(e)
-      setError(e?.data?.message ?? 'OTP verification failed');
-    } finally {
-      setLoading(false);
+      const errMsg = e?.data?.message || e?.message || 'OTP verification failed';
+      setError(errMsg);
+      toast.error(errMsg);
     }
   };
 
   const handleResend = async () => {
-    setResending(true);
     try {
-      const res = await resendOtp({ email }).unwrap();
-      console.log("res", res)
+      if (purpose === 'forgot-password') {
+        const res = await resendForgotPasswordOtp({
+          token: currentToken,
+        }).unwrap();
+
+        toast.success(res?.message || 'Verification code resent successfully');
+
+        const newToken =
+          res?.data?.token ||
+          (typeof res?.data === 'string' ? res?.data : null) ||
+          res?.token;
+
+        if (newToken) {
+          setCurrentToken(newToken);
+        }
+      } else {
+        const res = await resendOtp({ email }).unwrap();
+        toast.success(res?.message || 'Verification code resent successfully');
+      }
+
       otpRef.current?.clear();
       setOtp('');
-    } catch (e) {
-      console.warn(e);
-    } finally {
-      setResending(false);
+      setError('');
+    } catch (e: any) {
+      const errMsg = e?.data?.message || e?.message || 'Failed to resend code';
+      toast.error(errMsg);
     }
   };
 
@@ -103,14 +160,20 @@ export default function OtpVerification() {
 
         <View style={tw`flex-row items-center justify-center py-4 mt-16`}>
           <Text style={tw`text-gray-500 text-sm`}>Didn't receive the code? </Text>
-          <TouchableOpacity onPress={handleResend} disabled={resending}>
+          <TouchableOpacity onPress={handleResend} disabled={isResending}>
             <Text style={tw`text-sm text-amber-500 font-semibold`}>
-              {resending ? 'Sending...' : 'Resend'}
+              {isResending ? 'Sending...' : 'Resend'}
             </Text>
           </TouchableOpacity>
         </View>
 
-        <Button text={loading ? 'Verifying...' : 'Verify OTP'} onPress={handleVerify} loading={loading} />
+        <View style={tw`py-4`}>
+          <Button
+            text={isVerifying ? 'Verifying...' : 'Verify'}
+            onPress={handleVerify}
+            loading={isVerifying}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

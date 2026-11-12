@@ -18,6 +18,18 @@ export async function loadSession(): Promise<{
   return { token, user: userJson ? JSON.parse(userJson) : null };
 }
 
+export async function updateStoredUser(partialUser: Partial<AuthUser>) {
+  try {
+    const userJson = await SecureStore.getItemAsync(USER_KEY);
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      const updated = { ...user, ...partialUser };
+      await SecureStore.setItemAsync(USER_KEY, JSON.stringify(updated));
+    }
+  } catch (err) {
+  }
+}
+
 export async function clearSession() {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
   await SecureStore.deleteItemAsync(USER_KEY);

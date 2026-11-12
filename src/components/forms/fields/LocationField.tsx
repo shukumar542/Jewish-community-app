@@ -64,7 +64,6 @@ export default function LocationField({ field, control, setValue }: Props) {
           setIsOpen(data.length > 0);
         }
       } catch (err) {
-        console.warn('Location suggestion error:', err);
       } finally {
         setIsLoading(false);
       }

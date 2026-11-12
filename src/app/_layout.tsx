@@ -31,7 +31,6 @@ function RootNavigator() {
         const { token, user } = await loadSession();
         dispatch(hydrate({ token, user }));
       } catch (e) {
-        console.warn(e);
         dispatch(hydrate({ token: null, user: null }));
       }
     }
@@ -58,7 +57,6 @@ function RootNavigator() {
 
               <Stack.Protected guard={isAllowedInApp}>
                 <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="(settings)" />
               </Stack.Protected>
 
               <Stack.Protected guard={!token && !isGuest}>
@@ -68,6 +66,8 @@ function RootNavigator() {
               <Stack.Protected guard={!token}>
                 <Stack.Screen name="(auth)" />
               </Stack.Protected>
+
+              <Stack.Screen name="(settings)" />
             </Stack>
             <Toaster position="top-center" />
           </View>

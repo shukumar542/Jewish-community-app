@@ -40,7 +40,6 @@ export default function DynamicForm({ schema, onSubmit, isLoading }: Props) {
                     long = parseFloat(data[0].lon);
                 }
             } catch (e) {
-                console.warn('Geocoding fallback error:', e);
             }
         }
 
@@ -65,7 +64,6 @@ export default function DynamicForm({ schema, onSubmit, isLoading }: Props) {
                     brisLong = parseFloat(data[0].lon);
                 }
             } catch (e) {
-                console.warn('Geocoding fallback error for brisAddress:', e);
             }
         }
 

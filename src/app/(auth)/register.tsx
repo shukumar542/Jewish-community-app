@@ -27,7 +27,7 @@ export default function Register() {
   const validate = () => {
     let valid = true;
 
-    // purono error clear kora
+    // Clear previous errors
     setFullNameError('');
     setEmailError('');
     setPasswordError('');
@@ -73,22 +73,20 @@ export default function Register() {
         confirmPassword,
       }).unwrap();
 
-      console.log('Register success:', res);
 
       router.push({
         pathname: '/(auth)/OtpVerification',
         params: { email: email.trim(), purpose: 'register' },
       });
     } catch (err: any) {
-      console.log('Register error:', err);
 
       const message =
         err?.data?.message ||
         (err?.status === 'FETCH_ERROR'
-          ? 'Server e connect kora jachhe na. Network check korun.'
-          : 'Registration failed. Abar try korun.');
+          ? 'Network error. Please check your connection.'
+          : 'Registration failed. Please try again.');
 
-      // email already exist type error hole email field e dekhano
+      // If email already exists, show error under email field
       if (/email/i.test(message)) {
         setEmailError(message);
       } else {

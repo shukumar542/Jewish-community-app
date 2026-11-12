@@ -39,6 +39,7 @@ export default function Home() {
 
   const events = data?.data ?? [];
 
+
   return (
     <SafeAreaView style={tw`flex-1 bg-white`} edges={['top']}>
       <StatusBar style="dark" />

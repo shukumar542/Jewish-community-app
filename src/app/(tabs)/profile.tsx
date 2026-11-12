@@ -1,18 +1,19 @@
-import { clearSession } from '@/lib/authStorage';
+import { clearSession, updateStoredUser } from '@/lib/authStorage';
 import tw from '@/lib/tw';
 import { authApi, useLogoutMutation } from '@/services/authApi';
-import { settingsApi } from '@/services/settingsApi';
-import { logout as logoutAction } from '@/store/authSlice';
+import { settingsApi, useGetProfileQuery } from '@/services/settingsApi';
+import { logout as logoutAction, updateUser } from '@/store/authSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
   Modal,
   Pressable,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -36,6 +37,31 @@ export default function Profile() {
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
+
+  const {
+    data: profileData,
+    isLoading: isProfileLoading,
+    isFetching: isProfileFetching,
+    refetch: refetchProfile,
+  } = useGetProfileQuery(undefined, { skip: isGuest });
+
+  const profile = profileData?.data;
+
+  
+
+  // Sync profile data to Redux user when loaded
+  useEffect(() => {
+    if (profile?.fullName && profile.fullName !== user?.fullName) {
+      dispatch(updateUser({ fullName: profile.fullName }));
+      updateStoredUser({ fullName: profile.fullName });
+    }
+  }, [profile?.fullName, user?.fullName, dispatch]);
+
+  const displayName =
+    profile?.fullName || user?.fullName || (isGuest ? 'Guest User' : 'User');
+  const displayEmail =
+    user?.email || (isGuest ? 'Browsing as Guest' : '');
+  const displayAvatar = profile?.picture;
 
   const handleLogout = async () => {
     try {
@@ -80,6 +106,7 @@ export default function Profile() {
     { icon: 'document-text-outline', label: 'Terms and Conditions', onPress: () => navigateOnce('/(settings)/termsCondition') },
   ];
 
+
   return (
     <SafeAreaView style={tw`flex-1 bg-white`} edges={['top']}>
       <StatusBar style="dark" />
@@ -87,28 +114,48 @@ export default function Profile() {
         style={tw`flex-1 px-5`}
         contentContainerStyle={tw`pb-6`}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          !isGuest ? (
+            <RefreshControl
+              refreshing={isProfileFetching && !isProfileLoading}
+              onRefresh={refetchProfile}
+              tintColor="#f59e0b"
+              colors={['#f59e0b']}
+            />
+          ) : undefined
+        }
       >
         {/* Header */}
         <Text style={tw`text-2xl font-bold text-gray-900 mt-4 mb-5`}>Profile</Text>
 
         {/* User Info */}
         <View style={tw`flex-row items-center mb-5`}>
-          <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d' }}
-            style={tw`w-14 h-14 rounded-xl `}
-          />
-          <View style={tw`ml-3`}>
+          {displayAvatar ? (
+            <Image
+              source={{ uri: displayAvatar }}
+              style={tw`w-14 h-14 rounded-xl bg-gray-100`}
+            />
+          ) : (
+            <View
+              style={tw`w-14 h-14 rounded-xl bg-amber-50 items-center justify-center border border-amber-200`}
+            >
+              <Ionicons name="person" size={26} color="#f59e0b" />
+            </View>
+          )}
+          <View style={tw`ml-3 flex-1`}>
             <Text style={tw`text-lg font-bold text-gray-900`}>
-              {user?.fullName || (isGuest ? 'Guest User' : 'Nahid')}
+              {displayName}
             </Text>
-            <Text style={tw`text-gray-400 text-sm`}>
-              {user?.email || (isGuest ? 'Browsing as Guest' : 'nahid@gmail.com')}
-            </Text>
+            {displayEmail ? (
+              <Text style={tw`text-gray-400 text-sm`}>
+                {displayEmail}
+              </Text>
+            ) : null}
           </View>
         </View>
 
         {/* Stats */}
-        <View style={tw`flex-row gap-3 mb-6`}>
+        {/* <View style={tw`flex-row gap-3 mb-6`}>
           {stats.map((stat) => (
             <View
               key={stat.label}
@@ -118,7 +165,7 @@ export default function Profile() {
               <Text style={tw`text-gray-400 text-xs mt-1 text-center`}>{stat.label}</Text>
             </View>
           ))}
-        </View>
+        </View> */}
 
         {/* Menu List */}
         <View style={tw`border border-gray-200 rounded-2xl overflow-hidden mb-6`}>

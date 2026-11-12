@@ -58,14 +58,27 @@ export interface GetEventsResponse {
 
 export interface ToggleFavouriteRequest {
   id: string;
-  isFavourite: boolean;
-  method?: 'PATCH' | 'POST';
+  isFavourite?: boolean;
+  method?: 'POST' | 'DELETE' | 'PATCH';
 }
 
 export interface ToggleFavouriteResponse {
   success?: boolean;
   message?: string;
   data?: any;
+}
+
+export interface GetFavoriteEventsParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface GetFavoriteEventsResponse {
+  success?: boolean;
+  message?: string;
+  data?: any;
+  events?: any[];
+  [key: string]: any;
 }
 
 export const eventApi = createApi({
@@ -105,12 +118,32 @@ export const eventApi = createApi({
       providesTags: ['Events'],
     }),
 
-    // Toggle Favourite / Unfavourite
+    // Toggle Favourite / Unfavourite (POST to add, DELETE to remove)
     toggleFavourite: builder.mutation<ToggleFavouriteResponse, ToggleFavouriteRequest>({
-      query: ({ id, isFavourite, method = 'PATCH' }) => ({
-        url: `/events/${id}/favourite`,
-        method,
-        body: { isFavourite },
+      query: ({ id, isFavourite, method }) => {
+        const httpMethod = method ?? (isFavourite === false ? 'DELETE' : 'POST');
+        return {
+          url: `/events/${id}/favorite`,
+          method: httpMethod,
+        };
+      },
+      invalidatesTags: ['Events'],
+    }),
+
+    // Add Favorite: POST /events/:id/favorite
+    addFavorite: builder.mutation<ToggleFavouriteResponse, string>({
+      query: (id) => ({
+        url: `/events/${id}/favorite`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Events'],
+    }),
+
+    // Remove Favorite: DELETE /events/:id/favorite
+    removeFavorite: builder.mutation<ToggleFavouriteResponse, string>({
+      query: (id) => ({
+        url: `/events/${id}/favorite`,
+        method: 'DELETE',
       }),
       invalidatesTags: ['Events'],
     }),
@@ -136,6 +169,20 @@ export const eventApi = createApi({
       }),
       providesTags: (result, error, id) => [{ type: 'Events', id }],
     }),
+
+    // Get Favorite Events
+    getFavoriteEvents: builder.query<GetFavoriteEventsResponse, GetFavoriteEventsParams | void>({
+      query: (params) => {
+        const page = params?.page ?? 1;
+        const limit = params?.limit ?? 10;
+        return {
+          url: '/events/favorites',
+          method: 'GET',
+          params: { page, limit },
+        };
+      },
+      providesTags: ['Events'],
+    }),
   }),
 });
 
@@ -146,5 +193,8 @@ export const {
   useSearchEventsQuery,
   useLazySearchEventsQuery,
   useToggleFavouriteMutation,
+  useAddFavoriteMutation,
+  useRemoveFavoriteMutation,
+  useGetFavoriteEventsQuery,
 } = eventApi;
 
